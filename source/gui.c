@@ -27,6 +27,7 @@ GtkGrid* tbl = NULL;
 GtkClipboard* clip = NULL;
 
 struct row {
+  int id;
   GtkButton* btn;
   GtkLabel* label;
   GtkLabel* counter;
@@ -37,12 +38,12 @@ int nrows = 0;
 
 // from D getContents(i) => const char*
 static void on_click(GtkButton* button, gpointer udata) {
-  int i = (intptr_t) udata;
-  gtk_clipboard_set_text(clip,getContents(i),-1);
+  int i = (intptr_t) udata;  
+  gtk_clipboard_set_text(clip,getContents(rows[i].id),-1);
 }
 
 // D calls refreshRow when it's reloaded its stuff
-void refreshRow(int i, const char* name, const char* summary, const char* count) {
+void refreshRow(int i, int id, const char* name, const char* summary, const char* count) {
   int oldrows = nrows;
   while(nrows<=i) {
     ++nrows;
@@ -72,6 +73,8 @@ void refreshRow(int i, const char* name, const char* summary, const char* count)
     gtk_widget_show_all(GTK_WIDGET(tbl));
     cur->ready = true;
   }
+
+  cur->id = id;
   
   gtk_button_set_label(cur->btn, name);
   gtk_label_set_text(cur->label, summary);

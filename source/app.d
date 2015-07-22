@@ -12,7 +12,7 @@ import std.string;
 import std.array;
 
 extern (C) void guiLoop(const char*, void*, void*);
-extern (C) void refreshRow(int, const char*, const char*, const char*);
+extern (C) void refreshRow(int, int, const char*, const char*, const char*);
 
 alias E = declassifier.Event;
 
