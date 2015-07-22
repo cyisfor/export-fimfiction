@@ -333,7 +333,7 @@ Handler pickHandler(string key, Handler parent) {
   case "u": return new DumbTag(parent,"u");
   case "s": return new DumbTag(parent,"s");
   case "hr": return new DumbTag(parent,"hr");
-  case "blockquote": return new DumbTag(parent,"blockquote");
+  case "blockquote": return new DumbTag(parent,"quote");
   case "img": return new ImageHandler(parent);
   case "font": return new FontHandler(parent);
   case "div": return new DivHandler(parent);
