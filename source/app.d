@@ -390,17 +390,27 @@ extern (C) static void reloadFile(void* ptr, void* funcptr) {
   dg();
 }
 
-extern(C) static const(char*) getContents(int i) {
+extern(C) static immutable(char)* getContents(int i) {
+  static immutable(char)* oo;
+  string o;
   switch(i) {
   case 0:
-    return std.string.toStringz(title.data);
+    o = title.data;
+    break;
   case 1:
-    return std.string.toStringz(story.data);
+    o = story.data;
+    break;
   case 2:
-    return std.string.toStringz(authorNotes.data);
+    o = authorNotes.data;
+    break;
   default:
     throw new Exception(format("Bad index %s",i));
   }
+
+  infof("pasting string %d %s",i,o[0..min(20,$)]);
+
+  oo = std.string.toStringz(o);
+  return oo;
 }
 
 alias word = wordcount;
@@ -426,25 +436,28 @@ void main(string[] args)
     trace(input);
     trace("--------------");
     parseHTML(input,builder);
-    int i = 0;
+    int i = -1;
     if(title.data.length > 0) {
       title = appender!string(strip(title.data));
       story = appender!string(strip(story.data));
       authorNotes = appender!string(strip(authorNotes.data));
             
       refreshRow(++i,
+                 0,
                  "title",
                  std.string.toStringz(title.data),
                  std.string.toStringz(format("%d",word.count(title.data))));
     }
     if(story.data.length > 0) {
       refreshRow(++i,
+                 1,
                  "body",
                  std.string.toStringz(story.data[0..min(20,$)]),
                  std.string.toStringz(format("%d",word.count(story.data))));
     }
     if(authorNotes.data.length > 0) {
       refreshRow(++i,
+                 2,
                  "author",
                  std.string.toStringz(authorNotes.data[0..min(20,$)]),
                  std.string.toStringz(format("%d",word.count(authorNotes.data))));
