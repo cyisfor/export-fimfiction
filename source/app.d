@@ -231,13 +231,25 @@ class DumbTag : Handler {
     super(parent);
     this.name = name;
   }
+
+  override void handle(E event) {
+    switch(event) {
+    case E.SelfClosing:
+      this._output();
+      break;
+    default:
+      return super.handle(event);
+    }
+  }
+
+  void _output() {
+    output("[" ~ this.name ~ "]");
+  }
   
   override void handle(E event, const(char)[] data) {
     switch(event) {
-    case E.SelfClosing:
-      goto case;
     case E.OpenEnd:            
-      output("[" ~ this.name ~ "]");
+      this._output();
       break;
     case E.Close:
       output("[/" ~ this.name ~ "]");
