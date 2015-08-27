@@ -145,6 +145,7 @@ class SmallHandler : Handler {
     super(parent);
   }
   override void handle(E event, const(char)[] data) {
+    infof("small handler %s",event);
     switch(event) {
     case E.OpenEnd:
       output("[size=0.75em]");
@@ -338,6 +339,7 @@ class Nada : Handler {
 
 
 Handler pickHandler(string key, Handler parent) {
+  infof("ughm %s",key);
   switch(key) {
   case "a": return new LinkHandler(parent);
   case "i": return new DumbTag(parent,"i");
@@ -354,6 +356,7 @@ Handler pickHandler(string key, Handler parent) {
   case "li": return new ListItemHandler(parent);
   case "h3": return new H3Handler(parent);
   case "title": return new TitleHandler(parent);
+  case "small": return new SmallHandler(parent);
   default:
     tracef("No idea what is %s",key);
     return new Nada(parent);
