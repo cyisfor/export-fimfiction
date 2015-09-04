@@ -398,7 +398,7 @@ class FIMBuilder : declassifier.Handler {
   }
 }
 
-extern (C) static void reloadFile(void* ptr, void* funcptr) {
+extern (C) static void invoke(void* ptr, void* funcptr) {
   void delegate() dg;
   dg.funcptr = cast(void function())(funcptr);
   dg.ptr = ptr;

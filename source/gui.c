@@ -8,7 +8,14 @@
 
 #include <assert.h>
 
-extern void reloadFile(void*,void (*)(void));
+struct delegate {
+  void* ctx;
+  void (*funcptr)(void);
+};
+
+extern void invoke(void*,void (*)(void));
+#define INVOKE(dg) invoke(dg->ctx,dg->funcptr);
+
 extern const char* getContents(int);
 
 static GtkLabel* makeLabel() {
@@ -81,14 +88,9 @@ void refreshRow(int i, int id, const char* name, const char* summary, const char
   gtk_label_set_text(cur->counter, count);    
 }
 
-struct delegate {
-  void* ctx;
-  void (*funcptr)(void);
-};
-
 static void doRefresh(GtkButton* btn, void* udata) {
-  struct delegate* dg = (struct delegate*) udata;
-  reloadFile(dg->ctx,dg->funcptr); // causes D to call assureRow/refreshRow for each row.
+  struct delegate* reload = (struct delegate*) udata;
+  INVOKE(reload); // causes D to call assureRow/refreshRow for each row.
 }
 
 static void
@@ -98,15 +100,15 @@ refreshPathChanged (GFileMonitor     *monitor,
                     GFileMonitorEvent event_type,
                     gpointer          udata) {
   if(event_type == G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT) {
-    //puts("updated");
-    struct delegate* dg = (struct delegate*) udata;
-    reloadFile(dg->ctx,dg->funcptr); // causes D to call assureRow/refreshRow for each row.
+    puts("updated");
+    struct delegate* reload = (struct delegate*) udata;
+    INVOKE(reload); // causes D to call assureRow/refreshRow for each row.
   }
 }
 
 
 void guiLoop(const char* path, void* ctx, void (*funcptr)(void)) {
-  struct delegate dg = { ctx, funcptr };
+  struct delegate reload = { ctx, funcptr };
   gtk_init(NULL,NULL);
   GtkWidget* win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   tbl = GTK_GRID(gtk_grid_new());
@@ -125,7 +127,7 @@ void guiLoop(const char* path, void* ctx, void (*funcptr)(void)) {
   assert(err==NULL);
   g_signal_connect(mon,"changed",G_CALLBACK(refreshPathChanged),&dg);
   gtk_widget_show_all(win);
-  reloadFile(dg.ctx,dg.funcptr); // causes D to call 
+  invoke(reload.ctx,reload.funcptr); // causes D to call 
   gtk_main();
   exit(0);
 }
