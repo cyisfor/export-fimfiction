@@ -100,15 +100,14 @@ refreshPathChanged (GFileMonitor     *monitor,
                     GFileMonitorEvent event_type,
                     gpointer          udata) {
   if(event_type == G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT) {
-    puts("updated");
     struct delegate* reload = (struct delegate*) udata;
     INVOKE(reload); // causes D to call assureRow/refreshRow for each row.
   }
 }
 
 
-void guiLoop(const char* path, void* ctx, void (*funcptr)(void)) {
-  struct delegate reload = { ctx, funcptr };
+void guiLoop(const char* path, void* ctx, void (*reloadfunc)(void)) {
+  struct delegate reload = { ctx, reloadfunc };
   gtk_init(NULL,NULL);
   GtkWidget* win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   tbl = GTK_GRID(gtk_grid_new());
@@ -118,14 +117,15 @@ void guiLoop(const char* path, void* ctx, void (*funcptr)(void)) {
   gtk_grid_insert_row(tbl,0);
   GtkWidget* refreshbtn = gtk_button_new_with_label("Reload");
   gtk_grid_attach(tbl,refreshbtn,0,0,3,1);
-  g_signal_connect(refreshbtn,"clicked",G_CALLBACK(doRefresh),&dg);
+  g_signal_connect(refreshbtn,"clicked",G_CALLBACK(doRefresh),&reload);
+  printf("Path %s\n",path);
   GFile* f = g_file_new_for_path(path);
   GError* err = NULL;
   GFileMonitor* mon = g_file_monitor_file
     (f,
      G_FILE_MONITOR_NONE,NULL,&err);
   assert(err==NULL);
-  g_signal_connect(mon,"changed",G_CALLBACK(refreshPathChanged),&dg);
+  g_signal_connect(mon,"changed",G_CALLBACK(refreshPathChanged),&reload);
   gtk_widget_show_all(win);
   invoke(reload.ctx,reload.funcptr); // causes D to call 
   gtk_main();

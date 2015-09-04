@@ -440,6 +440,7 @@ void main(string[] args)
   string dest = args[1];
 
   void recalculate() {
+    //info("recalculating by loading file again.",dest);
     title = appender!string();
     story= appender!string();
     
@@ -480,5 +481,5 @@ void main(string[] args)
   }
 
   void delegate() rc = &recalculate;
-  guiLoop(cast(const(char*))(dest),rc.ptr,cast(void*)(rc.funcptr));
+  guiLoop(std.string.toStringz(dest),rc.ptr,cast(void*)(rc.funcptr));
 }
