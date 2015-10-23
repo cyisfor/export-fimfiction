@@ -60,9 +60,10 @@ class AttrFinder : Handler {
     this.wanted = wanted;
   }
   override void handle(E event) {
-    switch(event) {
+	  log("foop");
+	  switch(event) {
     case E.SelfClosing:
-      assert(this.found);
+		assert(this.found);
       this.writeStart();
       this.writeEnd();
       break;
@@ -82,6 +83,10 @@ class AttrFinder : Handler {
       }
       break;
     case E.OpenEnd:
+		if(!this.found) {
+			fatalf("Couldn't find %s",this.wanted);
+		}
+
       assert(this.found);
       this.writeStart();
       break;
