@@ -191,7 +191,7 @@ class DivHandler : Handler {
   this(Handler parent) {
     super(parent);
   }
-  
+
   override void handle(E event, const(char)[] data) {
     switch(event) {
     case E.AttrName:
@@ -251,10 +251,10 @@ class DumbTag : Handler {
   void _output() {
     output("[" ~ this.name ~ "]");
   }
-  
+
   override void handle(E event, const(char)[] data) {
     switch(event) {
-    case E.OpenEnd:            
+    case E.OpenEnd:
       this._output();
       break;
     case E.Close:
@@ -308,7 +308,7 @@ class H3Handler : Handler {
   this(Handler parent) {
     super(parent);
   }
-  
+
   override void handle(E event, const(char)[] data) {
     switch(event) {
     case E.OpenEnd:
@@ -344,7 +344,6 @@ class Nada : Handler {
 
 
 Handler pickHandler(string key, Handler parent) {
-  infof("ughm %s",key);
   switch(key) {
   case "a": return new LinkHandler(parent);
   case "i": return new DumbTag(parent,"i");
@@ -448,9 +447,9 @@ void main(string[] args)
     //info("recalculating by loading file again.",dest);
     title = appender!string();
     story= appender!string();
-    
+
     authorNotes= appender!string();
-    
+
     File inp = File(dest);
     const(char)[] input = cast(const(char)[])(inp.rawRead(buffer));
     inp.close();
@@ -462,7 +461,7 @@ void main(string[] args)
       title = appender!string(strip(title.data));
       story = appender!string(strip(story.data));
       authorNotes = appender!string(strip(authorNotes.data));
-            
+
       refreshRow(++i,
                  0,
                  "title",
