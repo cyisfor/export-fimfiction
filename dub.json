@@ -1,0 +1,20 @@
+{
+	"name": "export-fimfiction",
+	"description": "A minimal D application.",
+	"copyright": "Copyright © 2015, user",
+	"authors": ["user"],
+	"dependencies": {
+        "htmld": "~>0.2.3"
+	},
+    "sourceFiles": [
+        "build/gui.o"
+    ],
+    "libs": [
+        "gtk+-3.0",
+        "glib-2.0",
+        "gio-2.0"
+    ],
+    "preBuildCommands": [
+        "make stuff"
+    ],        
+}
