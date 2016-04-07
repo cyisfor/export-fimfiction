@@ -63,7 +63,7 @@ class AttrFinder : Handler {
 	  log("foop");
 	  switch(event) {
     case E.SelfClosing:
-		assert(this.found);
+      assert(this.found,this.wanted);
       this.writeStart();
       this.writeEnd();
       break;
@@ -73,12 +73,14 @@ class AttrFinder : Handler {
   }
 
   override void handle(E event, const(char)[] data) {
+    writeln("err ",data," ",this.wanted," ",this.wanted == data);
     switch(event) {
     case E.AttrName:
-      this.found = data == this.wanted;
+      if(!this.found)
+        this.found = data == this.wanted;
       break;
     case E.AttrValue:
-      if(this.found) {
+      if(this.found && this.value is null) {
         this.value = cast(string)(data);
       }
       break;
