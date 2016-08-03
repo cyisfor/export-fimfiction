@@ -73,7 +73,6 @@ class AttrFinder : Handler {
   }
 
   override void handle(E event, const(char)[] data) {
-    writeln("err ",data," ",this.wanted," ",this.wanted == data);
     switch(event) {
     case E.AttrName:
       if(!this.found)
@@ -119,11 +118,38 @@ class LinkHandler : AttrFinder {
 class ImageHandler : AttrFinder {
   // images inside links in fimfiction are very screwy
   static bool commentMode = false;
+  bool found_derp = false;
+  string value_derp = null;
 
   this(Handler parent) {
     super(parent,"src");
   }
+  // ugh, matching/tracking TWO attributes is tricky
+  override void handle(E event, const(char)[] data) {
+    switch(event) {
+    case E.AttrName:
+      if(data == "data-fimfiction-src") {
+        this.found_derp = true;
+        return;
+      }
+      break;
+    case E.AttrValue:
+      if(this.found_derp && this.value_derp is null) {
+        writeln("err ",data," is fimficit src");
+
+        this.value_derp = cast(string)(data);
+        this.found_derp = false;
+        return;
+      }
+      break;
+    default: break;
+    }
+    super.handle(event,data);
+  }
+
   override void writeStart() {
+    if(this.value_derp !is null)
+      this.value = this.value_derp;
     output("[img]" ~ this.value ~ "[/img]");
     if(this.commentMode) {
       LinkHandler link = cast(LinkHandler)(this.parent);
