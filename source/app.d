@@ -45,6 +45,9 @@ class Handler : declassifier.Handler {
       trace("yay text");
       output(data);
       break;
+		case E.Comment:
+			tracef("Comment stripped: %s",data);
+			break;
     default:
       warningf("What is this event? %s %s",declassifier.names[event],data);
     }
@@ -259,6 +262,21 @@ class DivHandler : Handler {
   }
 }
 
+class Paragraph : Handler {
+	this(Handler parent) {
+		super(parent);
+	}
+	override void handle(E event, const char[] data) {
+		switch(event) {
+		case E.Close:
+			output("\n\n");
+		case E.Text:
+			output(data.strip("\n"));
+		default:
+			super.handle(event,data);
+		}
+	}
+}
 class DumbTag : Handler {
   string name;
   this(Handler parent, string name) {
@@ -380,6 +398,7 @@ Handler pickHandler(string key, Handler parent) {
   case "s": return new DumbTag(parent,"s");
   case "hr": return new DumbTag(parent,"hr");
   case "blockquote": return new DumbTag(parent,"quote");
+	case "p": return new Paragraph(parent);
   case "img": return new ImageHandler(parent);
   case "font": return new FontHandler(parent);
   case "div": return new DivHandler(parent);
@@ -390,7 +409,7 @@ Handler pickHandler(string key, Handler parent) {
   case "title": return new TitleHandler(parent);
   case "small": return new SmallHandler(parent);
   default:
-    tracef("No idea what is %s",key);
+    warningf("No idea what is %s",key);
     return new Nada(parent);
     //throw new Exception(format(
   }
@@ -465,7 +484,7 @@ alias word = wordcount;
 void main(string[] args)
 {
   dest = &story;
-  globalLogLevel = LogLevel.info;
+  globalLogLevel = LogLevel.trace;
   char[100000] buffer;
   ImageHandler.commentMode = (null != environment.get("comment"));
   Declassifier builder = Declassifier(new FIMBuilder);
