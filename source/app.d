@@ -23,6 +23,7 @@ Appender!string authorNotes;
 Appender!string* dest = null;
 
 void output(T)(T item) {
+	tracef("POOT (%s)",item);
   dest.put(item);
 }
 
@@ -138,7 +139,7 @@ class ImageHandler : AttrFinder {
       break;
     case E.AttrValue:
       if(this.found_derp && this.value_derp is null) {
-        writeln("err ",data," is fimficit src");
+        warning("err ",data," is fimficit src");
 
         this.value_derp = cast(string)(data);
         this.found_derp = false;
@@ -266,17 +267,21 @@ class Paragraph : Handler {
 	this(Handler parent) {
 		super(parent);
 	}
-	override void handle(E event, const char[] data) {
+	override void handle(E event, const(char)[] data) {
 		switch(event) {
-		case E.Close:
-			output("\n\n");
 		case E.Text:
-			output(data.strip("\n"));
+			// newlines surround the <p> tags in my stories
+			auto s = cast(string) data.strip;
+			if(s.length > 0) {
+				output(s);
+			}
+			break;
 		default:
 			super.handle(event,data);
 		}
 	}
 }
+
 class DumbTag : Handler {
   string name;
   this(Handler parent, string name) {
