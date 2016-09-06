@@ -489,7 +489,7 @@ alias word = wordcount;
 void main(string[] args)
 {
   dest = &story;
-  globalLogLevel = LogLevel.trace;
+  globalLogLevel = LogLevel.info;
   char[100000] buffer;
   ImageHandler.commentMode = (null != environment.get("comment"));
   Declassifier builder = Declassifier(new FIMBuilder);
