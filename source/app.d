@@ -517,17 +517,19 @@ void main(string[] args)
   dest = &story;
 	void setlvl() {
 		auto lvl = environment.get("log");
-	if(lvl !is null) {
-		static foreach(i, member; EnumMembers!LogLevel) {
-			if(member == lvl) {
-				globalLogLevel = i;
-				return;
+		if(lvl !is null) {
+			static foreach(i, member; EnumMembers!LogLevel) {
+				if(member == lvl) {
+					globalLogLevel = i;
+					return;
+				}
 			}
+			assert(false,"What log level is " ~ lvl);
+		} else {
+			globalLogLevel = LogLevel.info;
 		}
-		assert(false,"What log level is " ~ lvl);
-	} else {
-		globalLogLevel = LogLevel.info;
 	}
+	setlvl();
   char[100000] buffer;
   ImageHandler.commentMode = (null != environment.get("comment"));
   Declassifier builder = Declassifier(new FIMBuilder);
