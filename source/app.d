@@ -127,7 +127,7 @@ void process(NodeType)(ref NodeType e) {
 	default:
 		warnf("Skipping tag %s",e.tag);
 		return;
-	};
+	}
 } 
 
 alias word = wordcount;
@@ -138,7 +138,7 @@ void main(string[] args)
 	void setlvl() {
 		auto lvl = environment.get("log");
 		if(lvl !is null) {
-			static foreach(i, member; EnumMembers!LogLevel) {
+			foreach(i, member; EnumMembers!LogLevel) {
 				if(member == lvl) {
 					globalLogLevel = i;
 					return;
