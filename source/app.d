@@ -1,7 +1,6 @@
 import wordcount;
 import declassifier;
 
-
 import html.parser;
 
 import std.experimental.logger;
