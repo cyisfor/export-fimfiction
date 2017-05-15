@@ -1,7 +1,6 @@
 import wordcount;
-import declassifier;
 
-import html.parser;
+import html.dom: createDocument;
 
 import std.experimental.logger;
 
@@ -399,6 +398,24 @@ class Nada : Handler {
   override void onEntity(const(char)[] data, const(char)[] decoded) { }
 };
 
+class WhenHandler: Handler {
+	bool condition = false;
+	bool inblock = false;
+	int depth = 0;
+	this(Handler parent) {
+    super(parent);
+  }
+  override void handle(E event, const(char)[] data) {
+		if(inblock) {
+			switch(event) {
+			case E.SelfClosing:
+				if(data == "else") {
+				if(data == "when") {
+					++depth;
+	}
+  override void handle(E event) { }
+  override void onEntity(const(char)[] data, const(char)[] decoded) {
+	}
 
 
 Handler pickHandler(string key, Handler parent) {
@@ -420,6 +437,7 @@ Handler pickHandler(string key, Handler parent) {
   case "h3": return new H3Handler(parent);
   case "title": return new TitleHandler(parent);
   case "small": return new SmallHandler(parent);
+	case "when": return new WhenHandler(parent);
   default:
     warningf("No idea what is %s",key);
     return new Nada(parent);
@@ -495,8 +513,21 @@ alias word = wordcount;
 
 void main(string[] args)
 {
+	import std.traits: EnumMembers;
   dest = &story;
-  globalLogLevel = LogLevel.trace;
+	void setlvl() {
+		auto lvl = environment.get("log");
+	if(lvl !is null) {
+		static foreach(i, member; EnumMembers!LogLevel) {
+			if(member == lvl) {
+				globalLogLevel = i;
+				return;
+			}
+		}
+		assert(false,"What log level is " ~ lvl);
+	} else {
+		globalLogLevel = LogLevel.info;
+	}
   char[100000] buffer;
   ImageHandler.commentMode = (null != environment.get("comment"));
   Declassifier builder = Declassifier(new FIMBuilder);
