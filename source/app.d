@@ -1,5 +1,6 @@
 import wordcount;
 import declassifier;
+import html_when: process_when;
 
 import html.parser;
 

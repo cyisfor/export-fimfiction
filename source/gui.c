@@ -105,6 +105,13 @@ refreshPathChanged (GFileMonitor     *monitor,
   }
 }
 
+static void setCensored(GtkToggleButton *togglebutton, gpointer user_data) {
+	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(censored))) {
+		setenv("censored","1",1);
+	} else {
+		unsetenv("censored");
+	}
+}
 
 void guiLoop(const char* path, void* ctx, void (*reloadfunc)(void)) {
   struct delegate reload = { ctx, reloadfunc };
@@ -116,8 +123,13 @@ void guiLoop(const char* path, void* ctx, void (*reloadfunc)(void)) {
   clip = gtk_clipboard_get(GDK_SELECTION_CLIPBOARD);
   gtk_grid_insert_row(tbl,0);
   GtkWidget* refreshbtn = gtk_button_new_with_label("Reload");
-  gtk_grid_attach(tbl,refreshbtn,0,0,3,1);
+  gtk_grid_attach(tbl,refreshbtn,0,0,2,1);
   g_signal_connect(refreshbtn,"clicked",G_CALLBACK(doRefresh),&reload);
+	GtkWidget* censored = gtk_check_button_new();
+  gtk_grid_attach(tbl,censored,0,2,1,1);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(censored), NULL != getenv("censored"));
+  g_signal_connect(censored,"toggled",G_CALLBACK(setCensored),NULL);
+	
   printf("Path %s\n",path);
   GFile* f = g_file_new_for_path(path);
   GError* err = NULL;
