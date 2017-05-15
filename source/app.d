@@ -66,7 +66,7 @@ void process(NodeType)(ref NodeType e) {
 		output("[/" ~ realname ~ "]");
 	}
 	void argTag(string realname, string arg) {
-		output("[" ~ realname ~ "=" ~ arg "]");
+		output("[" ~ realname ~ "=" ~ arg ~ "]");
 		pkids();
 		output("[/" ~ realname ~ "]");
 	}
