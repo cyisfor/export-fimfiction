@@ -13,8 +13,6 @@ import std.array;
 extern (C) void guiLoop(const char*, void*, void*);
 extern (C) void refreshRow(int, int, const char*, const char*, const char*);
 
-alias E = declassifier.Event;
-
 Appender!string title;
 Appender!string story;
 Appender!string authorNotes;
@@ -24,459 +22,6 @@ Appender!string* dest = null;
 void output(T)(T item) {
 	tracef("POOT (%s)",item);
   dest.put(item);
-}
-
-class Handler : declassifier.Handler {
-  Handler parent;
-  this(Handler parent) {
-    this.parent = parent;
-  }
-  void handle(E event) {
-    //uhm...
-  }
-  void onEntity(const(char)[] data, const(char)[] decoded) {
-		warningf("entity %s",decoded);
-    output(decoded);
-  }
-  void handle(E event, const(char)[] data) {
-    switch(event) {
-    case E.CDATA:
-      goto case;
-    case E.Text:
-      trace("yay text");
-      output(data);
-      break;
-		case E.Comment:
-			tracef("Comment stripped: %s",data);
-			break;
-		case E.NamedEntity:
-			tracef("named entity %s",data);
-			break;
-		case E.NumericEntity:
-			tracef("numeric entity %s",data);
-			break;
-    default:
-      warningf("What is this event? %s %s",declassifier.names[event],data);
-    }
-  }
-}
-
-class AttrFinder : Handler {
-  string wanted;
-  bool found;
-  string value;
-  this(Handler parent, string wanted) {
-    super(parent);
-    this.wanted = wanted;
-  }
-  override void handle(E event) {
-	  log("foop");
-	  switch(event) {
-    case E.SelfClosing:
-      assert(this.found,this.wanted);
-      this.writeStart();
-      this.writeEnd();
-      break;
-    default:
-      return super.handle(event);
-    }
-  }
-
-  override void handle(E event, const(char)[] data) {
-    switch(event) {
-    case E.AttrName:
-      if(!this.found)
-        this.found = data == this.wanted;
-      break;
-    case E.AttrValue:
-      if(this.found && this.value is null) {
-        this.value = cast(string)(data);
-      }
-      break;
-    case E.OpenEnd:
-		if(!this.found) {
-			fatalf("Couldn't find %s",this.wanted);
-		}
-
-      assert(this.found);
-      this.writeStart();
-      break;
-    case E.Close:
-      this.writeEnd();
-      break;
-    default:
-      return super.handle(event,data);
-    }
-  }
-
-  abstract void writeStart();
-  abstract void writeEnd();
-}
-
-class LinkHandler : AttrFinder {
-  this(Handler parent) {
-    super(parent,"href");
-  }
-  override void writeStart() {
-    output("[url=" ~ this.value ~ "]");
-  }
-  override void writeEnd() {
-    output("[/url]");
-  }
-}
-
-class ImageHandler : AttrFinder {
-  // images inside links in fimfiction are very screwy
-  static bool commentMode = false;
-  bool found_derp = false;
-  string value_derp = null;
-
-  this(Handler parent) {
-    super(parent,"src");
-  }
-  // ugh, matching/tracking TWO attributes is tricky
-  override void handle(E event, const(char)[] data) {
-    switch(event) {
-    case E.AttrName:
-      if(data == "data-fimfiction-src") {
-        this.found_derp = true;
-        return;
-      }
-      break;
-    case E.AttrValue:
-      if(this.found_derp && this.value_derp is null) {
-        warning("err ",data," is fimficit src");
-
-        this.value_derp = cast(string)(data);
-        this.found_derp = false;
-        return;
-      }
-      break;
-    default: break;
-    }
-    super.handle(event,data);
-  }
-
-  override void writeStart() {
-    if(this.value_derp !is null)
-      this.value = this.value_derp;
-    output("[img]" ~ this.value ~ "[/img]");
-    if(this.commentMode) {
-      LinkHandler link = cast(LinkHandler)(this.parent);
-      if(link) {
-        output("\n" ~ link.value);
-      }
-    }
-  }
-  override void writeEnd() {
-  }
-}
-
-class FontHandler : AttrFinder {
-  this(Handler parent) {
-    super(parent,"color");
-  }
-  override void writeStart() {
-    output("[color=" ~ this.value ~ "]");
-  }
-  override void writeEnd() {
-    output("[/color]");
-  }
-}
-class SmallHandler : Handler {
-  this(Handler parent) {
-    super(parent);
-  }
-  override void handle(E event, const(char)[] data) {
-    infof("small handler %s",event);
-    switch(event) {
-    case E.OpenEnd:
-      output("[size=0.75em]");
-      break;
-    case E.Close:
-      output("[/size]");
-      break;
-    default:
-      return super.handle(event,data);
-    }
-  }
-}
-
-class TitleHandler : Handler {
-  this(Handler parent) {
-    super(parent);
-  }
-  override void handle(E event, const(char)[] data) {
-    switch(event) {
-    case E.OpenEnd:
-      dest = &title;
-      break;
-    case E.Close:
-      dest = &story;
-      break;
-    default:
-      return super.handle(event,data);
-    }
-  }
-}
-
-
-class DivHandler : Handler {
-  bool found;
-  bool classboo;
-  bool authorial;
-  string value;
-  this(Handler parent) {
-    super(parent);
-  }
-
-  override void handle(E event, const(char)[] data) {
-    switch(event) {
-    case E.AttrName:
-      this.found = (data == "spoiler");
-      if(!this.found) {
-        this.classboo = data == "class";
-      }
-      break;
-    case E.AttrValue:
-      if(!this.found && this.classboo) {
-        // TODO: data contains the word spoiler...
-        this.found = data == "spoiler";
-        if(!this.found) {
-          this.authorial = data == "author";
-        }
-      }
-      break;
-    case E.OpenEnd:
-      if(this.found) {
-        output("[spoiler]");
-      }
-      if(this.authorial) {
-        dest = &authorNotes;
-      }
-      break;
-    case E.Close:
-      if(this.found) {
-        output("[/spoiler]");
-      }
-      if(this.authorial) {
-        dest = &story;
-      }
-      break;
-    default:
-      return super.handle(event,data);
-    }
-  }
-}
-
-class Paragraph : Handler {
-	this(Handler parent) {
-		super(parent);
-	}
-	override void handle(E event, const(char)[] data) {
-		switch(event) {
-		case E.Text:
-			// newlines surround the <p> tags in my stories
-			auto s = cast(string) data.strip;
-			if(s.length > 0) {
-				output(s);
-			}
-			break;
-		default:
-			super.handle(event,data);
-		}
-	}
-}
-
-class DumbTag : Handler {
-  string name;
-  this(Handler parent, string name) {
-    super(parent);
-    this.name = name;
-  }
-
-  override void handle(E event) {
-    switch(event) {
-    case E.SelfClosing:
-      this._output();
-      break;
-    default:
-      return super.handle(event);
-    }
-  }
-
-  void _output() {
-    output("[" ~ this.name ~ "]");
-  }
-
-  override void handle(E event, const(char)[] data) {
-    switch(event) {
-    case E.OpenEnd:
-      this._output();
-      break;
-    case E.Close:
-      output("[/" ~ this.name ~ "]");
-      break;
-    default:
-      return super.handle(event,data);
-    }
-  }
-}
-
-class ListHandler : Handler {
-  bool numeric = false;
-  int number = 1;
-  this(Handler parent, bool numeric) {
-    super(parent);
-    this.numeric = numeric;
-  }
-}
-
-const wchar bullet = '•';
-
-class ListItemHandler : Handler {
-  this(Handler parent) {
-    super(parent);
-  }
-
-  override void handle(E event, const(char)[] data) {
-    switch(event) {
-    case E.OpenEnd:
-      ListHandler derp = cast(ListHandler)(parent);
-      if(derp.numeric) {
-        output(format("%d",derp.number++));
-        output(") ");
-      } else {
-        // XXX: TODO: nested lists have clear bullets?
-        output(bullet);
-        output(' ');
-      }
-      break;
-    case E.Close:
-      output('\n');
-      break;
-    default:
-      return super.handle(event,data);
-    }
-  }
-}
-
-class H3Handler : Handler {
-  this(Handler parent) {
-    super(parent);
-  }
-
-  override void handle(E event, const(char)[] data) {
-    switch(event) {
-    case E.OpenEnd:
-      output("[size=2em]");
-      break;
-    case E.Close:
-      output("[/size]");
-      break;
-    default:
-      return super.handle(event,data);
-    }
-  }
-}
-
-template Construct(T) {
-  Handler derp(Handler parent) {
-    return new T(parent);
-  }
-  Handler function(Handler) Construct() {
-    return &derp;
-  }
-}
-
-class Nada : Handler {
-  this(Handler parent) {
-    super(parent);
-  }
-  override void handle(E event, const(char)[] data) { }
-  override void handle(E event) { }
-  override void onEntity(const(char)[] data, const(char)[] decoded) { }
-};
-
-class WhenHandler: Handler {
-	bool condition = false;
-	bool inblock = false;
-	int depth = 0;
-	this(Handler parent) {
-    super(parent);
-  }
-  override void handle(E event, const(char)[] data) {
-		if(inblock) {
-			switch(event) {
-			case E.SelfClosing:
-				if(data == "else") {
-				if(data == "when") {
-					++depth;
-	}
-  override void handle(E event) { }
-  override void onEntity(const(char)[] data, const(char)[] decoded) {
-	}
-
-
-Handler pickHandler(string key, Handler parent) {
-  switch(key) {
-  case "a": return new LinkHandler(parent);
-  case "i": return new DumbTag(parent,"i");
-  case "b": return new DumbTag(parent,"b");
-  case "u": return new DumbTag(parent,"u");
-  case "s": return new DumbTag(parent,"s");
-  case "hr": return new DumbTag(parent,"hr");
-  case "blockquote": return new DumbTag(parent,"quote");
-	case "p": return new Paragraph(parent);
-  case "img": return new ImageHandler(parent);
-  case "font": return new FontHandler(parent);
-  case "div": return new DivHandler(parent);
-  case "ul": return new ListHandler(parent,false);
-  case "ol": return new ListHandler(parent,true);
-  case "li": return new ListItemHandler(parent);
-  case "h3": return new H3Handler(parent);
-  case "title": return new TitleHandler(parent);
-  case "small": return new SmallHandler(parent);
-	case "when": return new WhenHandler(parent);
-  default:
-    warningf("No idea what is %s",key);
-    return new Nada(parent);
-    //throw new Exception(format(
-  }
-}
-
-class FIMBuilder : declassifier.Handler {
-  Handler curtag;
-  this() {
-    curtag = new Handler(null);
-  }
-  override void handle(E event) {
-    tracef("Got %s %s",declassifier.names[event],this.curtag.toString());
-    this.curtag.handle(event);
-    if(event == E.SelfClosing) {
-      this.curtag = this.curtag.parent;
-    }
-  }
-  override void onEntity(const(char)[] data, const(char)[] decoded) {
-    output(decoded);
-  }
-  override void handle(E event, const(char)[] data) {
-    tracef("Got %s: %s %d",declassifier.names[event],data,data.length);
-    switch(event) {
-    case E.OpenStart:
-      this.curtag = pickHandler(cast(string)(data),this.curtag);
-      break;
-    case E.SelfClosing:
-      goto case;
-    case E.Close:
-      this.curtag.handle(event,data);
-      this.curtag = this.curtag.parent;
-      break;
-    default:
-      // bail out if no idea what the current tag is?
-      this.curtag.handle(event,data);
-    }
-  }
 }
 
 extern (C) static void invoke(void* ptr, void* funcptr) {
@@ -509,12 +54,87 @@ extern(C) static immutable(char)* getContents(int i) {
   return oo;
 }
 
+void process(NodeType)(ref NodeType e) {
+	void pkids() {
+		foreach(ref kid; e.children) {
+			process(kid);
+		}				
+	}
+	void dumbTag(string realname) {
+		output("[" ~ realname ~ "]");
+		pkids();
+		output("[/" ~ realname ~ "]");
+	}
+	void argTag(string realname, string arg) {
+		output("[" ~ realname ~ "=" ~ arg "]");
+		pkids();
+		output("[/" ~ realname ~ "]");
+	}
+
+	void dolist(bool ordered) {
+		foreach(ref kid; e.children) {
+			if(ordered) output((++i).to!string() ~ ") ");
+			else output("• ");
+			foreach(ref kkid; kid.children) {
+				// assert(kkid.name == "li")
+				process(kkid);
+			}
+			output("\n");
+		}
+	}
+	if(isTextNode(e)) {
+		output(e.txt);
+		return;
+	} else if(isCommentNode(e)) {
+		tracef("Comment stripped: %s",e.firstChild.text);
+		return;
+	}
+	switch(e.tag) {
+	case "a": return argTag("url",e.attr("href"));
+	case "i": return dumbTag("i");
+	case "b": return dumbTag("b");
+	case "u": return dumbTag("u");
+	case "s": return dumbTag("s");
+	case "hr": return dumbTag("hr");
+	case "blockquote": return dumbTag("quote");
+	case "font": return argTag("color",e.attr("color"));
+	case "small": return argTag("size","0.75em");
+	case "ul": return dolist!false();
+	case "ol": return dolist!true();
+	case "h3": return argTag("size","2em");
+	case "div":
+		switch(e.attr("class")) {
+		case "spoiler":
+			return dumbTag("spoiler");
+		default:
+			goto case;
+		}
+		goto case;
+	case "p":
+		// strip
+		return pkids();
+	case "img":
+		auto src = img.attr("data-fimfiction-src");
+		if(src is null) {
+			src = img.attr("src");
+			if(src is null) {
+				warnf("Skipping sourceless image");
+				return;
+			}
+		}
+		output("[img]" ~ src ~ "[/img]");
+		return;
+	default:
+		warnf("Skipping tag %s",e.tag);
+		return;
+	};
+} 
+
 alias word = wordcount;
 
 void main(string[] args)
 {
 	import std.traits: EnumMembers;
-  dest = &story;
 	void setlvl() {
 		auto lvl = environment.get("log");
 		if(lvl !is null) {
@@ -530,49 +150,58 @@ void main(string[] args)
 		}
 	}
 	setlvl();
-  char[100000] buffer;
-  ImageHandler.commentMode = (null != environment.get("comment"));
-  Declassifier builder = Declassifier(new FIMBuilder);
-  string dest = args[1];
+
+  string source = args[1];
 
   void recalculate() {
+		import html_when: process_when;
+		import std.file: readText;
+		auto doc = createDocument(readText(source));
+		auto storyE = doc.root;
+		process_when(storyE);
+		
+		auto titleE = story.find("title");
+
     //info("recalculating by loading file again.",dest);
     title = appender!string();
-    story= appender!string();
-
+		if(titleE) {
+			titleE.detach();
+			dest = &title;
+			process(titleE);
+		}
+		dest = &authorNotes;
     authorNotes= appender!string();
-
-    File inp = File(dest);
-    const(char)[] input = cast(const(char)[])(inp.rawRead(buffer));
-    inp.close();
-    trace(input);
-    trace("--------------");
-    parseHTML(input,builder);
-    int i = -1;
+		foreach(ref authorNotesE; story.find_all("div.author")) {
+			authorNotesE.detach();
+			process(authorNotesE);
+		}
+		dest = &story;
+		story= appender!string();
+		process(storyE);
+  
     if(title.data.length > 0) {
-      title = appender!string(strip(title.data));
-      story = appender!string(strip(story.data));
-      authorNotes = appender!string(strip(authorNotes.data));
-
+      auto titleS = strip(title.data);
       refreshRow(++i,
                  0,
                  "title",
                  std.string.toStringz(title.data),
-                 std.string.toStringz(format("%d",word.count(title.data))));
+                 std.string.toStringz(format("%d",word.count(titleS))));
     }
     if(story.data.length > 0) {
+			auto storyS = strip(story.data);
       refreshRow(++i,
                  1,
                  "body",
                  std.string.toStringz(story.data[0..min(20,$)]),
-                 std.string.toStringz(format("%d",word.count(story.data))));
+                 std.string.toStringz(format("%d",word.count(storyS))));
     }
     if(authorNotes.data.length > 0) {
+			auto authorS = strip(authorNotes.data)[0..min(20,$)];
       refreshRow(++i,
                  2,
                  "author",
-                 std.string.toStringz(authorNotes.data[0..min(20,$)]),
-                 std.string.toStringz(format("%d",word.count(authorNotes.data))));
+                 std.string.toStringz(authorS),
+                 std.string.toStringz(format("%d",word.count(authorS))));
     }
   }
 
