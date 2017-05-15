@@ -16,5 +16,16 @@
     ],
     "preBuildCommands": [
         "make stuff"
-    ],        
+    ],
+	"subPackages": [
+		{
+			"name": "html_when",
+      "dependencies": {
+        "generate:htmld": "*"
+      },
+      "targetType": "library",
+      "sourcePaths": ["html_when/source"],
+      "importPaths": ["html_when/source"],
+    }
+	]
 }

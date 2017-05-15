@@ -36,6 +36,7 @@ class Handler : declassifier.Handler {
     //uhm...
   }
   void onEntity(const(char)[] data, const(char)[] decoded) {
+		warningf("entity %s",decoded);
     output(decoded);
   }
   void handle(E event, const(char)[] data) {
@@ -48,6 +49,12 @@ class Handler : declassifier.Handler {
       break;
 		case E.Comment:
 			tracef("Comment stripped: %s",data);
+			break;
+		case E.NamedEntity:
+			tracef("named entity %s",data);
+			break;
+		case E.NumericEntity:
+			tracef("numeric entity %s",data);
 			break;
     default:
       warningf("What is this event? %s %s",declassifier.names[event],data);
@@ -489,7 +496,7 @@ alias word = wordcount;
 void main(string[] args)
 {
   dest = &story;
-  globalLogLevel = LogLevel.info;
+  globalLogLevel = LogLevel.trace;
   char[100000] buffer;
   ImageHandler.commentMode = (null != environment.get("comment"));
   Declassifier builder = Declassifier(new FIMBuilder);
