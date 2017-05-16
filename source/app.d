@@ -183,7 +183,8 @@ void main(string[] args)
 		dest = &story;
 		story= appender!string();
 		process(storyE);
-  
+
+		int i = 0;
     if(title.data.length > 0) {
       auto titleS = strip(title.data);
       refreshRow(++i,
