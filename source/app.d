@@ -118,18 +118,18 @@ void process(NodeType)(ref NodeType e) {
 		// strip
 		return pkids();
 	case "img":
-		auto src = img.attr("data-fimfiction-src");
+		auto src = e.attr("data-fimfiction-src");
 		if(src is null) {
-			src = img.attr("src");
+			src = e.attr("src");
 			if(src is null) {
-				warnf("Skipping sourceless image");
+				warningf("Skipping sourceless image");
 				return;
 			}
 		}
 		output("[img]" ~ src ~ "[/img]");
 		return;
 	default:
-		warnf("Skipping tag %s",e.tag);
+		warningf("Skipping tag %s",e.tag);
 		return;
 	}
 } 
@@ -176,7 +176,7 @@ void main(string[] args)
 		}
 		dest = &authorNotes;
     authorNotes= appender!string();
-		foreach(ref authorNotesE; storyE.find_all("div.author")) {
+		foreach(ref authorNotesE; storyE.find("div.author")) {
 			authorNotesE.detach();
 			process(authorNotesE);
 		}
