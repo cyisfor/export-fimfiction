@@ -114,6 +114,7 @@ void process(NodeType)(ref NodeType e) {
 			break;
 		}
 		goto case;
+	case "root":
 	case "p":
 		// strip
 		return pkids();
