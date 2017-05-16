@@ -111,7 +111,7 @@ void process(NodeType)(ref NodeType e) {
 		case "spoiler":
 			return dumbTag("spoiler");
 		default:
-			goto case;
+			break;
 		}
 		goto case;
 	case "p":
