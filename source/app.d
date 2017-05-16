@@ -138,9 +138,9 @@ void main(string[] args)
 	void setlvl() {
 		auto lvl = environment.get("log");
 		if(lvl !is null) {
-			foreach(member; EnumMembers!LogLevel) {
-				if(member.to!string == lvl) {
-					globalLogLevel = member;
+			foreach(member; __traits(allMembers,LogLevel)) {
+				if(member == lvl) {
+					globalLogLevel = __traits(getMember, LogLevel, member);
 					return;
 				}
 			}
