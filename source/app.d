@@ -212,5 +212,5 @@ void main(string[] args)
   }
 
   void delegate() rc = &recalculate;
-  guiLoop(std.string.toStringz(dest),rc.ptr,cast(void*)(rc.funcptr));
+  guiLoop(std.string.toStringz(source),rc.ptr,cast(void*)(rc.funcptr));
 }
