@@ -4,7 +4,8 @@
 	"copyright": "Copyright © 2015, user",
 	"authors": ["user"],
 	"dependencies": {
-        "htmld": "~>0.2.3"
+    "htmld": "~>0.2.3",
+		"html_when": "*"
 	},
     "sourceFiles": [
         "build/gui.o"
@@ -21,7 +22,7 @@
 		{
 			"name": "html_when",
       "dependencies": {
-        "generate:htmld": "*"
+				"htmld": "~>0.2.3"
       },
       "targetType": "library",
       "sourcePaths": ["html_when/source"],
