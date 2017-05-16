@@ -207,7 +207,7 @@ void main(string[] args)
                  2,
                  "author",
                  std.string.toStringz(authorS),
-                 std.string.toStringz(format("%d",word.count(author.data))));
+                 std.string.toStringz(format("%d",word.count(authorNotes.data))));
     }
   }
 
