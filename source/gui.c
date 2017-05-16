@@ -127,6 +127,7 @@ void guiLoop(const char* path, void* ctx, void (*reloadfunc)(void)) {
   g_signal_connect(refreshbtn,"clicked",G_CALLBACK(doRefresh),&reload);
 	GtkWidget* censored = gtk_check_button_new();
   gtk_grid_attach(tbl,censored,2,0,1,1);
+	gtk_widget_set_tooltip(censored, "censored?");
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(censored), NULL != getenv("censored"));
   g_signal_connect(censored,"toggled",G_CALLBACK(setCensored),NULL);
 	
