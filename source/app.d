@@ -163,7 +163,7 @@ void main(string[] args)
 		auto storyE = doc.root;
 		process_when(storyE);
 		
-		auto titleE = storyE.find("title");
+		auto titleE = storyE.find("title").front;
 
     //info("recalculating by loading file again.",dest);
     title = appender!string();
