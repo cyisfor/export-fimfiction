@@ -198,7 +198,7 @@ void main(string[] args)
       refreshRow(++i,
                  1,
                  "body",
-                 std.string.toStringz(storyS);
+                 std.string.toStringz(storyS),
                  std.string.toStringz(format("%d",word.count(story.data))));
     }
     if(authorNotes.data.length > 0) {
