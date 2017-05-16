@@ -131,7 +131,7 @@ void guiLoop(const char* path, void* ctx, void (*reloadfunc)(void)) {
   gtk_grid_attach(tbl,censored,2,0,1,1);
 	gtk_widget_set_tooltip_markup(censored, "censored?");
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(censored), NULL != getenv("censored"));
-  g_signal_connect(censored,"toggled",G_CALLBACK(setCensored),NULL);
+  g_signal_connect(censored,"toggled",G_CALLBACK(setCensored),&reload);
 	
   printf("Path %s\n",path);
   GFile* f = g_file_new_for_path(path);
