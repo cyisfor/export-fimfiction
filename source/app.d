@@ -72,6 +72,7 @@ void process(NodeType)(ref NodeType e) {
 	}
 
 	void dolist(bool ordered) {
+		int i = 0;
 		foreach(ref kid; e.children) {
 			if(ordered) output((++i).to!string() ~ ") ");
 			else output("• ");
