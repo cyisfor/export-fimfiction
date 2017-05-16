@@ -173,6 +173,8 @@ void main(string[] args)
 			infof("Found title",titleE.front);
 			auto e = titleE.front;
 			e.detach();
+			titleE.popFront();
+			assert(titleE.empty());
 			dest = &title;
 			process(e);
 		}
