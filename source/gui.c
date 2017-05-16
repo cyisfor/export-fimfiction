@@ -105,12 +105,13 @@ refreshPathChanged (GFileMonitor     *monitor,
   }
 }
 
-static void setCensored(GtkToggleButton *censored, gpointer user_data) {
+static void setCensored(GtkToggleButton *censored, gpointer udata) {
 	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(censored))) {
 		setenv("censored","1",1);
 	} else {
 		unsetenv("censored");
 	}
+	struct delegate* reload = (struct delegate*) udata;
 	INVOKE(reload);
 }
 
