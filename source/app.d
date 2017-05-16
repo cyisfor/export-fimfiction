@@ -163,14 +163,15 @@ void main(string[] args)
 		auto storyE = doc.root;
 		process_when(storyE);
 		
-		auto titleE = storyE.find("title").front;
+		auto titleE = storyE.find("title");
 
     //info("recalculating by loading file again.",dest);
     title = appender!string();
 		if(titleE !is null) {
-			titleE.detach();
+			auto e = titleE.front;
+			e.detach();
 			dest = &title;
-			process(titleE);
+			process(e);
 		}
 		dest = &authorNotes;
     authorNotes= appender!string();
