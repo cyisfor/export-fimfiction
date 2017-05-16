@@ -160,7 +160,7 @@ void main(string[] args)
 		auto storyE = doc.root;
 		process_when(storyE);
 		
-		auto titleE = story.find("title");
+		auto titleE = storyE.find("title");
 
     //info("recalculating by loading file again.",dest);
     title = appender!string();
@@ -171,7 +171,7 @@ void main(string[] args)
 		}
 		dest = &authorNotes;
     authorNotes= appender!string();
-		foreach(ref authorNotesE; story.find_all("div.author")) {
+		foreach(ref authorNotesE; storyE.find_all("div.author")) {
 			authorNotesE.detach();
 			process(authorNotesE);
 		}
