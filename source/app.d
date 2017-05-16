@@ -190,16 +190,16 @@ void main(string[] args)
       refreshRow(++i,
                  0,
                  "title",
-                 std.string.toStringz(title.data),
+                 std.string.toStringz(titleS),
                  std.string.toStringz(format("%d",word.count(titleS))));
     }
     if(story.data.length > 0) {
-			auto storyS = strip(story.data);
+			auto storyS = strip(story.data)[0..min(20,$)];
       refreshRow(++i,
                  1,
                  "body",
-                 std.string.toStringz(story.data[0..min(20,$)]),
-                 std.string.toStringz(format("%d",word.count(storyS))));
+                 std.string.toStringz(storyS);
+                 std.string.toStringz(format("%d",word.count(story.data))));
     }
     if(authorNotes.data.length > 0) {
 			auto authorS = strip(authorNotes.data)[0..min(20,$)];
@@ -207,7 +207,7 @@ void main(string[] args)
                  2,
                  "author",
                  std.string.toStringz(authorS),
-                 std.string.toStringz(format("%d",word.count(authorS))));
+                 std.string.toStringz(format("%d",word.count(author.data))));
     }
   }
 
