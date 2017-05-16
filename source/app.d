@@ -71,10 +71,12 @@ void process(NodeType)(ref NodeType e) {
 		output("[/" ~ realname ~ "]");
 	}
 
-	void dolist(bool ordered) {
-		int i = 0;
+	void dolist(bool ordered)() {
+		static if(ordered) {
+			int i = 0;
+		}
 		foreach(ref kid; e.children) {
-			if(ordered) output((++i).to!string() ~ ") ");
+			static if(ordered) output((++i).to!string() ~ ") ");
 			else output("• ");
 			foreach(ref kkid; kid.children) {
 				// assert(kkid.name == "li")
