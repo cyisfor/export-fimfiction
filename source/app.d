@@ -76,6 +76,7 @@ void process(NodeType)(ref NodeType e) {
 			int i = 0;
 		}
 		foreach(ref kid; e.children) {
+			import std.conv: to;
 			static if(ordered) output((++i).to!string() ~ ") ");
 			else output("• ");
 			foreach(ref kkid; kid.children) {
