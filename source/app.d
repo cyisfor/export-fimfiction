@@ -65,7 +65,7 @@ void process(NodeType)(ref NodeType e) {
 		pkids();
 		output("[/" ~ realname ~ "]");
 	}
-	void argTag(string realname, string arg) {
+	void argTag(T)(string realname, T arg) {
 		output("[" ~ realname ~ "=" ~ arg ~ "]");
 		pkids();
 		output("[/" ~ realname ~ "]");
@@ -86,7 +86,7 @@ void process(NodeType)(ref NodeType e) {
 		}
 	}
 	if(e.isTextNode()) {
-		output(e.txt);
+		output(e.text);
 		return;
 	} else if(e.isCommentNode()) {
 		tracef("Comment stripped: %s",e.firstChild.text);
