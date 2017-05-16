@@ -140,7 +140,7 @@ void main(string[] args)
 		if(lvl !is null) {
 			foreach(i, member; EnumMembers!LogLevel) {
 				if(cast(char[])member == lvl) {
-					globalLogLevel = i;
+					globalLogLevel = member;
 					return;
 				}
 			}
