@@ -167,7 +167,7 @@ void main(string[] args)
 
     //info("recalculating by loading file again.",dest);
     title = appender!string();
-		if(titleE) {
+		if(titleE !is null) {
 			titleE.detach();
 			dest = &title;
 			process(titleE);
