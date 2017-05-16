@@ -85,10 +85,10 @@ void process(NodeType)(ref NodeType e) {
 			output("\n");
 		}
 	}
-	if(isTextNode(e)) {
+	if(e.isTextNode()) {
 		output(e.txt);
 		return;
-	} else if(isCommentNode(e)) {
+	} else if(e.isCommentNode()) {
 		tracef("Comment stripped: %s",e.firstChild.text);
 		return;
 	}
