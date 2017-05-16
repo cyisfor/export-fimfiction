@@ -170,6 +170,7 @@ void main(string[] args)
     //info("recalculating by loading file again.",dest);
     title = appender!string();
 		if(!titleE.empty) {
+			infof("Found title",titleE.front;
 			auto e = titleE.front;
 			e.detach();
 			dest = &title;
