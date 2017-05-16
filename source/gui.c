@@ -111,6 +111,7 @@ static void setCensored(GtkToggleButton *censored, gpointer user_data) {
 	} else {
 		unsetenv("censored");
 	}
+	INVOKE(reload);
 }
 
 void guiLoop(const char* path, void* ctx, void (*reloadfunc)(void)) {
