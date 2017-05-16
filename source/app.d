@@ -138,8 +138,8 @@ void main(string[] args)
 	void setlvl() {
 		auto lvl = environment.get("log");
 		if(lvl !is null) {
-			foreach(i, member; EnumMembers!LogLevel) {
-				if(i == lvl) {
+			foreach(member; EnumMembers!LogLevel) {
+				if(member.to!string == lvl) {
 					globalLogLevel = member;
 					return;
 				}
