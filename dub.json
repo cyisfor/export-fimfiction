@@ -5,7 +5,7 @@
 	"authors": ["user"],
 	"dependencies": {
     "htmld": "~>0.2.3",
-		"html_when": "*"
+		":html_when": "*"
 	},
     "sourceFiles": [
         "build/gui.o"
