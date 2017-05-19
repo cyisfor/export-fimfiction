@@ -161,9 +161,8 @@ void main(string[] args)
   void recalculate() {
 		import html_when: process_when;
 		import std.file: readText;
-		auto derp = readText(source);
-		info(derp);
-		auto doc = createDocument(derp);
+		auto doc = createDocument(readText(source));
+		info(doc.html)
 		auto storyE = doc.root;
 		process_when(storyE);
 		infof("um",storyE.html);
