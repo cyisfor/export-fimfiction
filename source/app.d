@@ -182,10 +182,12 @@ void main(string[] args)
 		foreach(ref authorNotesE; storyE.find("div.author")) {
 			authorNotesE.detach();
 			process(authorNotesE);
+			authorNotes.data = strip(authorNotes.data);
 		}
 		dest = &story;
-		story= appender!string();
+		story = appender!string();
 		process(storyE);
+		story.data = strip(story.data);
 
 		int i = 0;
 		ulong wid = 20;
