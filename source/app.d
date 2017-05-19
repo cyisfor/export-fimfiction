@@ -160,7 +160,7 @@ void main(string[] args)
 
 	// fimfiction is dangerous, so default to censored
 	if(environment.get("uncensored") is null) {
-		environment("censored") = "fimfiction sux";
+		environment["censored"] = "fimfiction sux";
 	}
 
   string source = args[1];
