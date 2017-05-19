@@ -161,7 +161,7 @@ void main(string[] args)
   void recalculate() {
 		import html_when: process_when;
 		import std.file: readText;
-		auto doc = createDocument("<body>" + readText(source) + "</body>");
+		auto doc = createDocument("<body>" ~ readText(source) ~ "</body>");
 		auto storyE = doc.root;
 		process_when(storyE);
 		infof("um",storyE.html);
