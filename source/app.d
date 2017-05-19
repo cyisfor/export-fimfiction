@@ -190,7 +190,7 @@ void main(string[] args)
 
 		int i = 0;
 		ulong wid = 20;
-    if(titleS.length > 0) {
+    if(titleS !is null && titleS.length > 0) {
 			import std.algorithm: max;
       auto titleS = strip(title.data);
 			wid = max(titleS.length,wid);
