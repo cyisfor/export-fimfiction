@@ -167,7 +167,7 @@ void main(string[] args)
 		process_when(storyE);
 		info("um",storyE.html.length);
 		auto titleE = storyE.find("title");
-
+		info("um",titleE);
     //info("recalculating by loading file again.",dest);
     title = appender!string();
 		if(!titleE.empty) {
