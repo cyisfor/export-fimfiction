@@ -168,11 +168,11 @@ void main(string[] args)
     //info("recalculating by loading file again.",dest);
 		if(!titleE.empty) {
 			import std.conv: to;
-			info("Found title ",titleE.front.text);
 			auto e = titleE.front;
 			e.detach();
 			titleE.popFront();
 			assert(titleE.empty());
+			info("Found title ",e.text);
 			titleS = e.text.to!string;
 		}
 		authorS = null;
