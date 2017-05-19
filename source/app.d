@@ -47,6 +47,8 @@ extern(C) static immutable(char)* getContents(int i) {
     throw new Exception(format("Bad index %s",i));
   }
 
+	o = o[0..min(max(20,title.length),$)];
+
   infof("pasting string %d %s",i,o[0..min(20,$)]);
 
   oo = toStringz(o);
