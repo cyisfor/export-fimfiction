@@ -6,7 +6,7 @@ import std.experimental.logger: info, infof, warningf, tracef;
 
 import std.algorithm: min;
 import std.process: environment;
-import std.string: format, strip;
+import std.string: format, strip, toStringz;
 import std.array: appender, Appender;
 
 extern (C) void guiLoop(const char*, void*, void*);
