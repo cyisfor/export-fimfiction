@@ -116,6 +116,7 @@ void process(NodeType)(ref NodeType e) {
 		goto case;
 	case "root":
 	case "p":
+	case "title":
 		// strip
 		return pkids();
 	case "img":
