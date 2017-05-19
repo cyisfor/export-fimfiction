@@ -49,7 +49,7 @@ extern(C) static immutable(char)* getContents(int i) {
 
   infof("pasting string %d %s",i,o[0..min(20,$)]);
 
-  oo = std.string.toStringz(o);
+  oo = toStringz(o);
   return oo;
 }
 
@@ -202,24 +202,24 @@ void main(string[] args)
       refreshRow(++i,
                  0,
                  "title",
-                 std.string.toStringz(titleS),
-                 std.string.toStringz(format("%d",word.count(titleS))));
+                 toStringz(titleS),
+                 toStringz(format("%d",word.count(titleS))));
     }
     if(storyS.length > 0) {
 			auto summ = storyS[0..min(wid,$)];
       refreshRow(++i,
                  1,
                  "body",
-                 std.string.toStringz(summ),
-                 std.string.toStringz(format("%d",word.count(storyS))));
+                 toStringz(summ),
+                 toStringz(format("%d",word.count(storyS))));
     }
     if(authorS !is null && authorS.length > 0) {
 			auto summ = authorS[0..min(wid,$)];
       refreshRow(++i,
                  2,
                  "author",
-                 std.string.toStringz(summ),
-                 std.string.toStringz(format("%d",word.count(authorS))));
+                 toStringz(summ),
+                 toStringz(format("%d",word.count(authorS))));
     }
   }
 
