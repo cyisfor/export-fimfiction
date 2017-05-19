@@ -191,7 +191,7 @@ void main(string[] args)
 		int wid = 20;
     if(title.data.length > 0) {
 			import std.algorithm: max;
-			wid = max(title.data.lenght,wid);
+			wid = max(title.data.length,wid);
       auto titleS = strip(title.data);
       refreshRow(++i,
                  0,
@@ -200,7 +200,7 @@ void main(string[] args)
                  std.string.toStringz(format("%d",word.count(titleS))));
     }
     if(story.data.length > 0) {
-			auto storyS = strip(story.data)[0..min(20,$)];
+			auto storyS = strip(story.data)[0..min(wid,$)];
       refreshRow(++i,
                  1,
                  "body",
@@ -208,7 +208,7 @@ void main(string[] args)
                  std.string.toStringz(format("%d",word.count(story.data))));
     }
     if(authorNotes.data.length > 0) {
-			auto authorS = strip(authorNotes.data)[0..min(20,$)];
+			auto authorS = strip(authorNotes.data)[0..min(wid,$)];
       refreshRow(++i,
                  2,
                  "author",
