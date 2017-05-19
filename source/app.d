@@ -170,9 +170,9 @@ void main(string[] args)
 			import std.conv: to;
 			auto e = titleE.front;
 			e.detach();
+			info("Found title ",e.text);
 			titleE.popFront();
 			assert(titleE.empty());
-			info("Found title ",e.text);
 			titleS = e.text.to!string;
 		}
 		authorS = null;
