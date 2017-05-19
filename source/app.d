@@ -6,7 +6,7 @@ import std.experimental.logger: info, infof, warningf, tracef;
 
 import std.algorithm: min;
 import std.process: environment;
-import std.stdio;
+#import std.stdio;
 import std.string;
 import std.array;
 
