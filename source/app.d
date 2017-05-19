@@ -165,7 +165,7 @@ void main(string[] args)
 		auto storyE = doc.root;
 		info(storyE.html);
 		process_when(storyE);
-		infof("um",storyE.html.length);
+		info("um",storyE.html.length);
 		auto titleE = storyE.find("title");
 
     //info("recalculating by loading file again.",dest);
