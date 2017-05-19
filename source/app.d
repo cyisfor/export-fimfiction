@@ -1,4 +1,4 @@
-import wordcount;
+bimport wordcount;
 
 import html.dom: createDocument;
 
@@ -170,7 +170,7 @@ void main(string[] args)
     //info("recalculating by loading file again.",dest);
     title = appender!string();
 		if(!titleE.empty) {
-			infof("Found title",titleE.front);
+			infof("Found title",titleE.front.html);
 			auto e = titleE.front;
 			e.detach();
 			titleE.popFront();
