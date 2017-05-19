@@ -2,7 +2,7 @@ import wordcount;
 
 import html.dom: createDocument;
 
-import std.experimental.logger;
+import std.experimental.logger: info;
 
 import std.algorithm;
 import std.process;
@@ -142,6 +142,7 @@ void main(string[] args)
 {
 	import std.traits: EnumMembers;
 	void setlvl() {
+		import std.experimental.logger: LogLevel, globalLogLevel;
 		auto lvl = environment.get("log");
 		if(lvl !is null) {
 			foreach(member; __traits(allMembers,LogLevel)) {
