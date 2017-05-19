@@ -164,7 +164,7 @@ void main(string[] args)
 		auto doc = createDocument(readText(source));
 		auto storyE = doc.root;
 		process_when(storyE);
-		infof("um",storyE);
+		infof("um",storyE.html);
 		auto titleE = storyE.find("title");
 
     //info("recalculating by loading file again.",dest);
