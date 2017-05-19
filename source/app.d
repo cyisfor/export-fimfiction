@@ -162,8 +162,8 @@ void main(string[] args)
 		import html_when: process_when;
 		import std.file: readText;
 		auto doc = createDocument(readText(source));
-		info(doc.root.html);
 		auto storyE = doc.root;
+		info(storyE);
 		process_when(storyE);
 		infof("um",storyE.html);
 		auto titleE = storyE.find("title");
