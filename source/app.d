@@ -163,7 +163,7 @@ void main(string[] args)
 		import std.file: readText;
 		auto doc = createDocument(readText(source));
 		alias storyE = doc.root;
-		info(doc.root.html);
+		info(storyE.html);
 		process_when(storyE);
 		infof("um",storyE.html);
 		auto titleE = storyE.find("title");
