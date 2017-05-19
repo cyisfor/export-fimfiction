@@ -191,8 +191,8 @@ void main(string[] args)
 		int wid = 20;
     if(title.data.length > 0) {
 			import std.algorithm: max;
-			wid = max(title.data.length,wid);
       auto titleS = strip(title.data);
+			wid = max(titleS.length,wid);
       refreshRow(++i,
                  0,
                  "title",
