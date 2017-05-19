@@ -163,36 +163,34 @@ void main(string[] args)
 		import std.file: readText;
 		auto doc = createDocument(readText(source));
 		auto storyE = doc.root;
-		info(storyE.html);
 		process_when(storyE);
-		info("um",storyE.html.length);
 		auto titleE = storyE.find("title");
     //info("recalculating by loading file again.",dest);
-    title = appender!string();
 		if(!titleE.empty) {
-			info("Found title",titleE.front.html);
+			import std.conv: to;
+			info("Found title",titleE.text);
 			auto e = titleE.front;
 			e.detach();
 			titleE.popFront();
 			assert(titleE.empty());
-			title.put(e.text);
+			titleS = e.text.to!string;
 		}
 		authorS = null;
+		dest = appender!string();
 		foreach(ref authorNotesE; storyE.find("div.author")) {
 			authorNotesE.detach();
 			process(authorNotesE);
-			if(authorS) authorS ~= strip(authorNotes.data);
-			else authorS = strip(authorNotes.data);
 		}
-		dest.clear();
+		authorS = strip(dest.data);
+
+		dest = appender!string();
 		process(storyE);
-		auto storyS = strip(story.data);
+		storyS = strip(dest.data);
 
 		int i = 0;
 		ulong wid = 20;
     if(titleS !is null && titleS.length > 0) {
 			import std.algorithm: max;
-      auto titleS = strip(title.data);
 			wid = max(titleS.length,wid);
       refreshRow(++i,
                  0,
