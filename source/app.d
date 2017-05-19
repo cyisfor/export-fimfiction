@@ -1,4 +1,4 @@
-bimport wordcount;
+import wordcount;
 
 import html.dom: createDocument;
 
