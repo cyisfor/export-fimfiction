@@ -162,7 +162,7 @@ void main(string[] args)
 		import html_when: process_when;
 		import std.file: readText;
 		auto doc = createDocument(readText(source));
-		alias storyE = doc.root;
+		auto storyE = doc.root;
 		info(storyE.html);
 		process_when(storyE);
 		infof("um",storyE.html);
