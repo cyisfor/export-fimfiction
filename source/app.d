@@ -188,7 +188,10 @@ void main(string[] args)
 		process(storyE);
 
 		int i = 0;
+		int wid = 20;
     if(title.data.length > 0) {
+			import std.algorithm: max;
+			wid = max(title.data.lenght,wid);
       auto titleS = strip(title.data);
       refreshRow(++i,
                  0,
