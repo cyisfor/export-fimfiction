@@ -188,7 +188,7 @@ void main(string[] args)
 		process(storyE);
 
 		int i = 0;
-		ulongx wid = 20;
+		ulong wid = 20;
     if(title.data.length > 0) {
 			import std.algorithm: max;
       auto titleS = strip(title.data);
