@@ -190,7 +190,7 @@ void main(string[] args)
 
 		int i = 0;
 		ulong wid = 20;
-    if(title.data.length > 0) {
+    if(titleS.length > 0) {
 			import std.algorithm: max;
       auto titleS = strip(title.data);
 			wid = max(titleS.length,wid);
@@ -200,7 +200,7 @@ void main(string[] args)
                  std.string.toStringz(titleS),
                  std.string.toStringz(format("%d",word.count(titleS))));
     }
-    if(story.data.length > 0) {
+    if(storyS.length > 0) {
 			auto summ = storyS[0..min(wid,$)];
       refreshRow(++i,
                  1,
