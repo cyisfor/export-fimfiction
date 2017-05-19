@@ -13,11 +13,7 @@ import std.array;
 extern (C) void guiLoop(const char*, void*, void*);
 extern (C) void refreshRow(int, int, const char*, const char*, const char*);
 
-Appender!string title;
-Appender!string story;
-Appender!string authorNotes;
-
-Appender!string* dest = null;
+Appender!string dest;
 
 void output(T)(T item) {
 	tracef("POOT (%s)",item);
@@ -31,18 +27,22 @@ extern (C) static void invoke(void* ptr, void* funcptr) {
   dg();
 }
 
+string storyS = null;
+string authorS = null;
+string titleS = null;
+
 extern(C) static immutable(char)* getContents(int i) {
   static immutable(char)* oo;
   string o;
   switch(i) {
   case 0:
-    o = title.data;
+    o = titleS;
     break;
   case 1:
-    o = story.data;
+    o = storyS;
     break;
   case 2:
-    o = authorNotes.data;
+    o = authorS;
     break;
   default:
     throw new Exception(format("Bad index %s",i));
@@ -177,17 +177,16 @@ void main(string[] args)
 			assert(titleE.empty());
 			title.put(e.text);
 		}
-		dest = &authorNotes;
-    authorNotes= appender!string();
+		authorS = null;
 		foreach(ref authorNotesE; storyE.find("div.author")) {
 			authorNotesE.detach();
 			process(authorNotesE);
-			authorNotes.data = strip(authorNotes.data);
+			if(authorS) authorS ~= strip(authorNotes.data);
+			else authorS = strip(authorNotes.data);
 		}
-		dest = &story;
-		story = appender!string();
+		dest.clear();
 		process(storyE);
-		story.data = strip(story.data);
+		auto storyS = strip(story.data);
 
 		int i = 0;
 		ulong wid = 20;
@@ -202,20 +201,20 @@ void main(string[] args)
                  std.string.toStringz(format("%d",word.count(titleS))));
     }
     if(story.data.length > 0) {
-			auto storyS = strip(story.data)[0..min(wid,$)];
+			auto summ = storyS[0..min(wid,$)];
       refreshRow(++i,
                  1,
                  "body",
-                 std.string.toStringz(storyS),
-                 std.string.toStringz(format("%d",word.count(story.data))));
+                 std.string.toStringz(summ),
+                 std.string.toStringz(format("%d",word.count(storyS))));
     }
-    if(authorNotes.data.length > 0) {
-			auto authorS = strip(authorNotes.data)[0..min(wid,$)];
+    if(authorS !is null && authorS.length > 0) {
+			auto summ = authorS[0..min(wid,$)];
       refreshRow(++i,
                  2,
                  "author",
-                 std.string.toStringz(authorS),
-                 std.string.toStringz(format("%d",word.count(authorNotes.data))));
+                 std.string.toStringz(summ),
+                 std.string.toStringz(format("%d",word.count(authorS))));
     }
   }
 
