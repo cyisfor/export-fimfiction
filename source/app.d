@@ -175,8 +175,7 @@ void main(string[] args)
 			e.detach();
 			titleE.popFront();
 			assert(titleE.empty());
-			dest = &title;
-			process(e);
+			title.put(e.text);
 		}
 		dest = &authorNotes;
     authorNotes= appender!string();
