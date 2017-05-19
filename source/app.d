@@ -173,7 +173,8 @@ void main(string[] args)
 			// info("Found title ",e.text);
 			titleE.popFront();
 			assert(titleE.empty());
-			titleS = e.text.to!string;
+			process(e);
+			titleS = dest.data;
 		}
 		authorS = null;
 		dest = appender!string();
