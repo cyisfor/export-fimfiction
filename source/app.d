@@ -205,6 +205,7 @@ void main(string[] args)
                  toStringz(titleS),
                  toStringz(format("%d",word.count(titleS))));
     }
+		info("WID",wid);
     if(storyS.length > 0) {
 			auto summ = storyS[0..min(wid,$)];
       refreshRow(++i,
