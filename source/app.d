@@ -4,8 +4,8 @@ import html.dom: createDocument;
 
 import std.experimental.logger: info, infof, warningf, tracef;
 
-
-import std.process;
+import std.algorithm: min;
+import std.process: environment;
 import std.stdio;
 import std.string;
 import std.array;
