@@ -7,7 +7,7 @@ import std.experimental.logger: info, infof, warningf, tracef;
 import std.algorithm: min;
 import std.process: environment;
 import std.string: format, strip;
-import std.array: appender;
+import std.array: appender, Appender;
 
 extern (C) void guiLoop(const char*, void*, void*);
 extern (C) void refreshRow(int, int, const char*, const char*, const char*);
