@@ -2,7 +2,7 @@ import wordcount;
 
 import html.dom: createDocument;
 
-import std.experimental.logger: info;
+import std.experimental.logger: info, infof, tracef;
 
 import std.algorithm;
 import std.process;
