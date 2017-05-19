@@ -4,7 +4,7 @@ import html.dom: createDocument;
 
 import std.experimental.logger: info, infof, warningf, tracef;
 
-import std.algorithm;
+
 import std.process;
 import std.stdio;
 import std.string;
