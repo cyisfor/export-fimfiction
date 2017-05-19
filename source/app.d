@@ -157,6 +157,11 @@ void main(string[] args)
 	}
 	setlvl();
 
+	// fimfiction is dangerous, so default to censored
+	if(environment.get("uncensored") is null) {
+		environment("censored") = "fimfiction sux";
+	}
+
   string source = args[1];
 
   void recalculate() {
