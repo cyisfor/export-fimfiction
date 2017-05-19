@@ -162,7 +162,7 @@ void main(string[] args)
 		import html_when: process_when;
 		import std.file: readText;
 		auto derp = readText(source);
-		print(derp);
+		infof(derp);
 		auto doc = createDocument(derp);
 		auto storyE = doc.root;
 		process_when(storyE);
