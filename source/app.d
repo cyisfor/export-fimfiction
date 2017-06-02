@@ -61,8 +61,10 @@ void process(NodeType)(ref NodeType e) {
 	}
 	void dumbTag(string realname) {
 		output("[" ~ realname ~ "]");
-		pkids();
-		output("[/" ~ realname ~ "]");
+		if(e.firstChild !is null) {
+			pkids();
+			output("[/" ~ realname ~ "]");
+		}
 	}
 	void argTag(T)(string realname, T arg) {
 		output("[" ~ realname ~ "=" ~ arg ~ "]");
