@@ -96,6 +96,7 @@ void process(NodeType)(ref NodeType e) {
 	}
 	switch(e.tag) {
 	case "a": return argTag("url",e.attr("href"));
+  case "chat": return dumbTag("code");
 	case "i": return dumbTag("i");
 	case "b": return dumbTag("b");
 	case "u": return dumbTag("u");
