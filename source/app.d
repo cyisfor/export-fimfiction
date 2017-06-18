@@ -80,10 +80,15 @@ void process(NodeType)(ref NodeType e) {
 			import std.conv: to;
 			static if(ordered) output((++i).to!string() ~ ") ");
 			else output("• ");
+			auto savedest = dest;
+			dest = appender!string();
 			foreach(ref kkid; kid.children) {
 				// assert(kkid.name == "li")
 				process(kkid);
 			}
+			auto item = dest.data;
+			dest = savedest;
+			output(item.trim());
 			output("\n");
 		}
 	}
