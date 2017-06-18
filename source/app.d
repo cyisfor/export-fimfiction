@@ -88,7 +88,7 @@ void process(NodeType)(ref NodeType e) {
 			}
 			auto item = dest.data;
 			dest = savedest;
-			output(item.trim());
+			output(item.strip());
 			output("\n");
 		}
 	}
