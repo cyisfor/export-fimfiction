@@ -119,7 +119,7 @@ void guiLoop(const char* path, void* ctx, void (*reloadfunc)(void)) {
   struct delegate reload = { ctx, reloadfunc };
   gtk_init(NULL,NULL);
   GtkWidget* win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	if(NULL != getenv("title"))
+	if(NULL != getenv("title")) {
 		gtk_window_set_title(GTK_WINDOW(win),getenv("title"));
 	}
   tbl = GTK_GRID(gtk_grid_new());
