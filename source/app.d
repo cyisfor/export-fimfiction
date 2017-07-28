@@ -8,7 +8,7 @@ import std.algorithm: min;
 import std.process: environment;
 import std.string: format, strip, toStringz;
 import std.array: appender, Appender;
-			import std.conv: to;
+import std.conv: to;
 
 extern (C) void guiLoop(const char*, void*, void*);
 extern (C) void refreshRow(int, int, const char*, const char*, const char*);
@@ -48,7 +48,7 @@ T deEntitize(T)(T inp) {
 			throw new Exception(("What is " ~ m[1] ~ "?").to!string);
 		}
 	}
-	return dentpat.replaceAll!replace(inp);
+	return replaceAll!replace(inp,dentpat);
 }
 
 extern(C) static immutable(char)* getContents(int i) {
