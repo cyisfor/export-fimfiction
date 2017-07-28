@@ -30,7 +30,7 @@ string storyS = null;
 string authorS = null;
 string titleS = null;
 
-import std.regex: regex, Captures;
+import std.regex: regex, Captures, replaceAll;
 
 auto dentpat = regex("&([^;\\s&]+);");
 
@@ -44,7 +44,7 @@ T deEntitize(T)(T inp) {
 		case "gt":
 			return ">";
 		default:
-			throw new RuntimeException("What is " ~ m[1] ~ "?");
+			throw new Exception("What is " ~ m[1] ~ "?");
 		}
 	}
 	return dentpat.replaceAll!replace(inp);
