@@ -30,9 +30,11 @@ string storyS = null;
 string authorS = null;
 string titleS = null;
 
+import std.regex: regex, Captures;
+
 auto dentpat = regex!"&([^;\\s&]+);";
 
-T deEntetize(T)(T inp) {
+T deEntitize(T)(T inp) {
 	T replace(Captures!T m) {
 		switch(m[1]) {
 		case "amp":
