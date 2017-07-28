@@ -8,6 +8,7 @@ import std.algorithm: min;
 import std.process: environment;
 import std.string: format, strip, toStringz;
 import std.array: appender, Appender;
+			import std.conv: to;
 
 extern (C) void guiLoop(const char*, void*, void*);
 extern (C) void refreshRow(int, int, const char*, const char*, const char*);
@@ -44,7 +45,7 @@ T deEntitize(T)(T inp) {
 		case "gt":
 			return ">";
 		default:
-			throw new Exception("What is " ~ m[1] ~ "?");
+			throw new Exception(("What is " ~ m[1] ~ "?").to!string);
 		}
 	}
 	return dentpat.replaceAll!replace(inp);
@@ -97,7 +98,6 @@ void process(NodeType)(ref NodeType e) {
 			int i = 0;
 		}
 		foreach(ref kid; e.children) {
-			import std.conv: to;
 			static if(ordered) output((++i).to!string() ~ ") ");
 			else output("• ");
 			auto savedest = dest;
