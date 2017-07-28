@@ -30,6 +30,24 @@ string storyS = null;
 string authorS = null;
 string titleS = null;
 
+auto dentpat = regex!"&([^;\\s&]+);";
+
+T deEntetize(T)(T inp) {
+	T replace(Captures!T m) {
+		switch(m[1]) {
+		case "amp":
+			return "&";
+		case "lt":
+			return "<";
+		case "gt":
+			return ">";
+		default:
+			throw new RuntimeException("What is " ~ m[1] ~ "?");
+		}
+	}
+	return dentpat.replaceAll!replace(inp);
+}
+
 extern(C) static immutable(char)* getContents(int i) {
   static immutable(char)* oo;
   string o;
@@ -93,7 +111,7 @@ void process(NodeType)(ref NodeType e) {
 		}
 	}
 	if(e.isTextNode()) {
-		output(e.text);
+		output(deEntitize(e.text));
 		return;
 	} else if(e.isCommentNode()) {
 		tracef("Comment stripped: %s",e.firstChild.text);
