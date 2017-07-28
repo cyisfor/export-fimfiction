@@ -32,7 +32,7 @@ string titleS = null;
 
 import std.regex: regex, Captures;
 
-auto dentpat = regex!"&([^;\\s&]+);";
+auto dentpat = regex("&([^;\\s&]+);");
 
 T deEntitize(T)(T inp) {
 	T replace(Captures!T m) {
