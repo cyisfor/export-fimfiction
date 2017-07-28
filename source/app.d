@@ -1,6 +1,7 @@
 import wordcount;
 
 import html.dom: createDocument;
+import html.entities: getEntityUTF8;
 
 import std.experimental.logger: info, infof, warningf, tracef;
 
@@ -37,16 +38,11 @@ auto dentpat = regex("&([^;\\s&]+);");
 
 T deEntitize(T)(T inp) {
 	T replace(Captures!T m) {
-		switch(m[1]) {
-		case "amp":
-			return "&";
-		case "lt":
-			return "<";
-		case "gt":
-			return ">";
-		default:
+		auto res = getEntityUTF8(m[1]);
+		if(res == null) {
 			throw new Exception(("What is " ~ m[1] ~ "?").to!string);
 		}
+		return res;
 	}
 	return replaceAll!replace(inp,dentpat);
 }
