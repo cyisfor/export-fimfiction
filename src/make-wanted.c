@@ -138,26 +138,22 @@ int main(int argc, char *argv[])
 	bool first = false;
 	void dump_tag(char* dest, struct trie* cur) {
 		size_t i;
-		if(cur->c) {
-			for(i=0;i<cur->nsubs;++i) {
+		for(i=0;i<cur->nsubs;++i) {
+			if(cur->c) {
 				*dest = toupper(cur->c);
 				dump_tag(dest+1, &cur->subs[i]);
-			}
-		} else {
-			if(first) {
-				first = false;
-				write(1,LITLEN("\n\t"));
 			} else {
-				write(1,LITLEN(",\n\t"));
-			} 
-			write(1,tag,dest-tag);
+				if(first) {
+					first = false;
+					write(1,LITLEN("\n\t"));
+				} else {
+					write(1,LITLEN(",\n\t"));
+				} 
+				write(1,tag,dest-tag);
+			}
 		}
 	}
 	write(1,LITLEN("enum wanted_tags {"));
-	size_t i;
-	for(i=0;i<root.nsubs;++i) {
-		// root has no letter
-		dump_tag(tag, &root.subs[i]);
-	}
+	dump_tag(tag, &root);
 	write(1,LITLEN("};\n"));
 }
