@@ -6,6 +6,7 @@
 #include <ctype.h> // isspace
 #include <error.h>
 #include <unistd.h> // write
+#include <stdbool.h>
 
 #define LITLEN(a) a,sizeof(a)-1
 
@@ -141,13 +142,13 @@ int main(int argc, char *argv[])
 				dump_tag(dest+1, &cur->subs[i]);
 			}
 		} else {
-			write(1,tag,dest-tag);
 			if(first) {
 				first = false;
 				write(1,LITLEN("\n\t"));
 			} else {
 				write(1,LITLEN(",\n\t"));
 			} 
+			write(1,tag,dest-tag);
 		}
 	}
 	write(1,LITLEN("enum wanted_tags {"));
