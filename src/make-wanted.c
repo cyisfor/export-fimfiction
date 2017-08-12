@@ -155,7 +155,7 @@ int main(int argc, char *argv[])
 		for(i=0;i<cur->nsubs;++i) {
 			char c = cur->subs[i].c;
 			*dest = toupper(c);
-			indent(level+1);
+			indent(level);
 			write(1,LITLEN("case '"));
 			if(c) {
 				write(1,&c,1);
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 		indent(level);
 		write(1,LITLEN("};\n"));
 	}
-	write(1,LITLEN("enum wanted_tags {"));
+	write(1,LITLEN("enum wanted_tags {\n"));
 	dump_tag(tag, &root, 0);
 	write(1,LITLEN("};\n"));
 }
