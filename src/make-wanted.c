@@ -148,10 +148,10 @@ int main(int argc, char *argv[])
 
 	void dump_memcmp(char* dest, struct trie* cur, int level) {
 		if(cur->subs[0].nsubs == 0) {
-			write(1,LITLEN("if(buf["))
+			write(1,LITLEN("if(buf["));
 			writei(level);
-			write(1,"] == '");
-			writei(1,&cur->c,1);
+			write(1,LITLEN("] == '"));
+			write(1,&cur->c,1);
 			write(1,LITLEN("')\n"));
 		} else {
 			indent(level);
