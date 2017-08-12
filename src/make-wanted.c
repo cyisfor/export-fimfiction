@@ -7,6 +7,7 @@
 #include <error.h>
 #include <unistd.h> // write
 #include <stdbool.h>
+#include <stdio.h> // snprintf
 
 #define LITLEN(a) a,sizeof(a)-1
 
@@ -165,7 +166,7 @@ int main(int argc, char *argv[])
 	bool nobranches(struct trie* cur) {
 		if(cur->nsubs > 1) return false;
 		if(cur->nsubs == 0) return true;
-		return nobranches(&cur->nsubs[0]);
+		return nobranches(&cur->subs[0]);
 	}
 	
 	void dump_tag(char* dest, struct trie* cur, int level) {
