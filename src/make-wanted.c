@@ -146,11 +146,6 @@ int main(int argc, char *argv[])
 	}
 	void dump_tag(char* dest, struct trie* cur, int level) {
 		size_t i;
-		indent(level);
-		write(1,LITLEN("switch (buf["));
-		char buf[0x100];
-		write(1,buf, snprintf(buf,0x100,"%d",level-1));
-		write(1,LITLEN("]) {\n"));
 		if(cur->nsubs == 1 && cur->subs[0].c == 0) {
 			indent(level+1);
 			write(1,LITLEN("return "));
@@ -158,6 +153,12 @@ int main(int argc, char *argv[])
 			write(1,LITLEN(";\n"));
 			return;
 		}
+		indent(level);
+		write(1,LITLEN("switch (buf["));
+		char buf[0x100];
+		write(1,buf, snprintf(buf,0x100,"%d",level-1));
+		write(1,LITLEN("]) {\n"));
+
 		for(i=0;i<cur->nsubs;++i) {
 			if(cur->subs[i].c) {
 				*dest = toupper(cur->subs[i].c);
