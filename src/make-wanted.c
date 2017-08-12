@@ -139,8 +139,8 @@ int main(int argc, char *argv[])
 	void dump_tag(char* dest, struct trie* cur) {
 		size_t i;
 		for(i=0;i<cur->nsubs;++i) {
-			if(cur->c) {
-				*dest = toupper(cur->c);
+			if(cur->subs[i].c) {
+				*dest = toupper(cur->subs[i].c);
 				dump_tag(dest+1, &cur->subs[i]);
 			} else {
 				if(first) {
