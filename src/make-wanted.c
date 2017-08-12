@@ -136,11 +136,18 @@ int main(int argc, char *argv[])
 	*/
 	char tag[0x100]; // err... 0x100 should be safe-ish.
 	bool first = false;
-	void dump_tag(char* dest, struct trie* cur) {
+	void dump_tag(char* dest, struct trie* cur, int level) {
 		size_t i;
+		write(1,LITLEN("switch (buf["));
+		char buf[0x100];
+		write(1,buf, snprintf(buf,0x100,"%d",level));
+		write(1,LITLEN("]) {\n"));
 		for(i=0;i<cur->nsubs;++i) {
 			if(cur->subs[i].c) {
 				*dest = toupper(cur->subs[i].c);
+				write(1,LITLEN("case '"));
+				write(1,&cur->subs[i].c);
+				write(1,LITLEN("':"));
 				dump_tag(dest+1, &cur->subs[i]);
 			} else {
 				if(first) {
@@ -152,6 +159,7 @@ int main(int argc, char *argv[])
 				write(1,tag,dest-tag);
 			}
 		}
+		write(1,LITLEN("};\n"));
 	}
 	write(1,LITLEN("enum wanted_tags {"));
 	dump_tag(tag, &root);
