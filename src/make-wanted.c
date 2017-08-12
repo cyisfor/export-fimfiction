@@ -87,16 +87,22 @@ int main(int argc, char *argv[])
 	for(;;) {
 		// cur should always point to non-whitespace here.
 		char* nl = memchr(cur,'\n',winfo.st_size-(cur-src));
-		if(nl != NULL) {
+		char* tail;
+		if(nl == NULL) {
 			// no newline at the end of file
-			char* naspace = nl-1;
-			if(naspace != cur) {
-				while(isspace(*naspace)) {
-					if(--naspace == cur) break;
+			tail = src + winfo.st_size-1;
+		} else {
+			tail = nl-1;
+		}
+		if(tail != cur) {
+			while(isspace(*tail)) {
+				while(isspace(*tail)) {
+					if(--tail == cur) break;
 				}
 			}
-			insert(cur,naspace - cur + 1);
 		}
+		insert(cur,tail - cur + 1);
+		if(nl == NULL) break;
 		cur = nl+1;
 		if(cur == src + winfo.st_size) {
 			// trailing newline
