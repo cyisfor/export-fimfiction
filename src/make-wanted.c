@@ -151,6 +151,13 @@ int main(int argc, char *argv[])
 		char buf[0x100];
 		write(1,buf, snprintf(buf,0x100,"%d",level-1));
 		write(1,LITLEN("]) {\n"));
+		if(cur->nsubs == 1 && cur->subs[0].c == 0) {
+			indent(level+1);
+			write(1,LITLEN("return "));
+			write(1,tag,dest-tag);
+			write(1,LITLEN(";\n"));
+			return;
+		}
 		for(i=0;i<cur->nsubs;++i) {
 			if(cur->subs[i].c) {
 				*dest = toupper(cur->subs[i].c);
@@ -159,11 +166,6 @@ int main(int argc, char *argv[])
 				write(1,&cur->subs[i].c,1);
 				write(1,LITLEN("':"));
 				dump_tag(dest+1, &cur->subs[i],level+1);
-			} else {
-				indent(level+1);
-				write(1,LITLEN("return "));
-				write(1,tag,dest-tag);
-				write(1,LITLEN(";\n"));
 			}
 		}
 		indent(level);
