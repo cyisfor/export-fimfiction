@@ -201,7 +201,7 @@ int main(int argc, char *argv[])
 				write(1,LITLEN("return "));
 				write(1,tag,dest-tag);
 				write(1,LITLEN(";\n"));
-			} else if(&cur->subs[i].nsubs == 0) {
+			} else if(cur->nsubs == 0 || &cur->subs[i].nsubs == 0) {
 				write(1,LITLEN("ehunno\n"));
 			} else if (nobranches(&cur->subs[i])) {
 				*dest++ = toupper(cur->subs[i].c);
