@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
 	}
 	void dump_tag(char* dest, struct trie* cur, int level) {
 		size_t i;
-		if(cur->nsubs == 1)
+		if(cur->nsubs == 1) {
 			if(cur->subs[0].c == 0) {
 				indent(level+1);
 				write(1,LITLEN("return "));
@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
 				write(1,&cur->subs[0].c,1);
 				write(1,LITLEN("') {\n"));
 			}
-		return;
+			return;
 		}
 		indent(level);
 
