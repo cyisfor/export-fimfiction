@@ -134,8 +134,10 @@ int main(int argc, char *argv[])
 	void dump_tag(struct trie* cur) {
 		size_t i;
 		for(i=0;i<cur->nsubs;++i) {
-			write(1,&cur->c,1);
-			dump_tag(&cur->subs[i]);
+			if(cur->c) {
+				write(1,&cur->c,1);
+				dump_tag(&cur->subs[i]);
+			}
 		}
 	}
 	write(1,LITLEN("enum wanted_tags {"));
