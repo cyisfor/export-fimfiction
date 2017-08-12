@@ -132,6 +132,7 @@ int main(int argc, char *argv[])
 		 -> aabaacabc add separators if at top
 	*/
 	char tag[0x100]; // err... 0x100 should be safe-ish.
+	bool first = false;
 	void dump_tag(char* dest, struct trie* cur) {
 		size_t i;
 		if(cur->c) {
@@ -141,17 +142,18 @@ int main(int argc, char *argv[])
 			}
 		} else {
 			write(1,tag,dest-tag);
+			if(first) {
+				first = false;
+				write(1,LITLEN("\n\t"));
+			} else {
+				write(1,LITLEN(",\n\t"));
+			} 
 		}
 	}
 	write(1,LITLEN("enum wanted_tags {"));
 	size_t i;
 	for(i=0;i<root.nsubs;++i) {
 		// root has no letter
-		if(i == 0) {
-			write(1,LITLEN("\n\t"));
-		} else {
-			write(1,LITLEN(",\n\t"));
-		} 
 		dump_tag(tag, &root.subs[i]);
 	}
 	write(1,LITLEN("};\n"));
