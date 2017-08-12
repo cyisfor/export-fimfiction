@@ -66,7 +66,11 @@ int main(int argc, char *argv[])
 				cur = &cur->subs[0];
 				cur->c = c;
 			}
-			// final one, be sure to null it out
+			// final one, be sure to add a terminator
+			cur->subs = malloc(sizeof(*cur->subs));
+			cur->nsubs = 1;
+			cur = &cur->subs[0];
+			cur->c = 0;
 			cur->subs = NULL;
 			cur->nsubs = 0;
 			return;
