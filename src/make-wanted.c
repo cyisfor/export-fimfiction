@@ -62,8 +62,8 @@ int main(int argc, char *argv[])
 			cur->c = c;
 			// we don't need to traverse the subs we create. just finish the string here
 			// as children.
-			for(++off;off<len;++off) {
-				c = tag[off];
+			for(++off;off<=len;++off) {
+				c = off == len ? 0 : tag[off];
 				cur->subs = malloc(sizeof(*cur->subs));
 				cur->nsubs = 1;
 				cur = &cur->subs[0];
