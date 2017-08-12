@@ -136,8 +136,17 @@ int main(int argc, char *argv[])
 	*/
 	char tag[0x100]; // err... 0x100 should be safe-ish.
 	bool first = false;
+	void indent(int level) {
+		int i=0;
+		char* buf = alloca(level);
+		for(i=0;i<level;++i) {
+			buf[i] = ' ';
+		}
+		write(1,buf,level);
+	}
 	void dump_tag(char* dest, struct trie* cur, int level) {
 		size_t i;
+		indent(level);
 		write(1,LITLEN("switch (buf["));
 		char buf[0x100];
 		write(1,buf, snprintf(buf,0x100,"%d",level));
@@ -145,18 +154,16 @@ int main(int argc, char *argv[])
 		for(i=0;i<cur->nsubs;++i) {
 			if(cur->subs[i].c) {
 				*dest = toupper(cur->subs[i].c);
+				indent(level+1);
 				write(1,LITLEN("case '"));
 				write(1,&cur->subs[i].c,1);
 				write(1,LITLEN("':"));
 				dump_tag(dest+1, &cur->subs[i],level+1);
 			} else {
-				if(first) {
-					first = false;
-					write(1,LITLEN("\n\t"));
-				} else {
-					write(1,LITLEN(",\n\t"));
-				} 
+				indent(level);
+				write(1,LITLEN("return "));
 				write(1,tag,dest-tag);
+				write(1,LITLEN(";\n"));
 			}
 		}
 		write(1,LITLEN("};\n"));
