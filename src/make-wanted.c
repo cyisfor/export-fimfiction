@@ -144,6 +144,23 @@ int main(int argc, char *argv[])
 		char buf[0x100];
 		write(1,buf, snprintf(buf,0x100,"%d",i));
 	}
+
+	void dump_memcmp(const char* dest, struct trie* cur, int level) {
+		indent(level);
+		write(1,LITLEN("if(0==strncmp(&buf["));
+		writei(level);
+		write(1,LITLEN("],\""));
+		while(cur && cur->c) {
+			write(1,&cur->c,1);
+			cur = &cur->subs[0];
+		}
+		write(1,LITLEN("\"))\n"));
+		indent(level+1);
+		write(1,LITLEN("return "));
+		write(1,tag,dest-tag);
+		write(1,LITLEN(";\n"));
+	}
+	
 	void dump_tag(char* dest, struct trie* cur, int level) {
 		size_t i;
 		bool first = true;
@@ -168,6 +185,8 @@ int main(int argc, char *argv[])
 				write(1,LITLEN("return "));
 				write(1,tag,dest-tag);
 				write(1,LITLEN(";\n"));
+			} else if (nobranches(&cur->subs[i])) {
+				dump_memcmp(dest,&cur->subs[i],level+1);
 			} else {
 				dump_tag(dest+1, &cur->subs[i],level+1);
 			}
