@@ -44,28 +44,30 @@ int main(int argc, char *argv[])
 
 	void insert(const char* tag, size_t len) {
 		void visit(struct trie* cur, size_t off) {
-			char c = tag[off];
-			size_t i;
-			// TODO: make subs sorted, and binary search to insert
-			// that'd be faster for LOTS of tags, probably slower otherwise
-			// because mergesort/indirection/etc
-			for(i=0;i<cur->nsubs;++i) {
-				struct trie* sub = &cur->subs[i];
-				if(sub->c == c) {
-					return visit(sub,off+1);
+			if(off != len) {
+				char c = tag[off];
+				size_t i;
+				// TODO: make subs sorted, and binary search to insert
+				// that'd be faster for LOTS of tags, probably slower otherwise
+				// because mergesort/indirection/etc
+				for(i=0;i<cur->nsubs;++i) {
+					struct trie* sub = &cur->subs[i];
+					if(sub->c == c) {
+						return visit(sub,off+1);
+					}
 				}
-			}
-			cur->subs = realloc(cur->subs,sizeof(*cur->subs)*(cur->nsubs+1));
-			cur = &cur->subs[cur->nsubs++];
-			cur->c = c;
-			// we don't need to traverse the subs we create. just finish the string here
-			// as children.
-			for(++off;off<len;++off) {
-				c = tag[off];
-				cur->subs = malloc(sizeof(*cur->subs));
-				cur->nsubs = 1;
-				cur = &cur->subs[0];
+				cur->subs = realloc(cur->subs,sizeof(*cur->subs)*(cur->nsubs+1));
+				cur = &cur->subs[cur->nsubs++];
 				cur->c = c;
+				// we don't need to traverse the subs we create. just finish the string here
+				// as children.
+				for(++off;off<len;++off) {
+					c = tag[off];
+					cur->subs = malloc(sizeof(*cur->subs));
+					cur->nsubs = 1;
+					cur = &cur->subs[0];
+					cur->c = c;
+				}
 			}
 			// final one, be sure to add a terminator
 			cur->subs = malloc(sizeof(*cur->subs));
@@ -138,7 +140,7 @@ int main(int argc, char *argv[])
 		size_t i;
 		if(cur->c) {
 			for(i=0;i<cur->nsubs;++i) {
-				*dest = cur->c;
+				*dest = toupper(cur->c);
 				dump_tag(dest+1, &cur->subs[i]);
 			}
 		} else {
