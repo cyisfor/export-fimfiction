@@ -55,15 +55,15 @@ int main(int argc, char *argv[])
 				}
 			}
 			cur->subs = realloc(cur->subs,sizeof(*cur->subs)*(cur->nsubs+1));
-			cur = &cur->subs[cur->nsubs++];
+			++cur->nsubs;
 			// we don't need to traverse the subs we create. just finish the string here
 			// as children.
-			for(++off;off<len;++off) {
+			for(;off<len;++off) {
+				cur = &cur->subs[cur->nsubs-1];
 				cur->c = c;
 				cur->subs = malloc(sizeof(*cur->subs));
 				cur->nsubs = 1;
 				c = tag[off];
-				cur = &cur->subs[0];
 			}
 			// final one, be sure to null it out
 			cur->subs = NULL;
