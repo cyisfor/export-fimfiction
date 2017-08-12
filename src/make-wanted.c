@@ -76,6 +76,7 @@ int main(int argc, char *argv[])
 	struct stat winfo;
 	assert(0==fstat(0,&winfo));
 	char* src = mmap(NULL,winfo.st_size,PROT_READ,MAP_PRIVATE,0,0);
+	assert(src != MAP_FAILED);
 	char* cur = src;
 	while(isspace(*cur)) {
 		if(++cur == src + winfo.st_size) {
@@ -86,7 +87,7 @@ int main(int argc, char *argv[])
 	for(;;) {
 		// cur should always point to non-whitespace here.
 		char* nl = memchr(cur,'\n',winfo.st_size-(cur-src));
-		if(nl == NULL) {
+		if(nl != NULL) {
 			// no newline at the end of file
 			char* naspace = nl-1;
 			if(naspace != cur) {
