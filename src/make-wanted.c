@@ -144,30 +144,36 @@ int main(int argc, char *argv[])
 		}
 		write(1,buf,level);
 	}
+	void writebufi(int i) {
+		write(1,LITLEN("buf["));
+		char buf[0x100];
+		write(1,buf, snprintf(buf,0x100,"%d",i));
+		write(1,LITLEN("]"));
+	}
 	void dump_tag(char* dest, struct trie* cur, int level) {
 		size_t i;
-		if(cur->nsubs == 1 && cur->subs[0].c == 0) {
-			indent(level+1);
-			write(1,LITLEN("return "));
-			write(1,tag,dest-tag);
-			write(1,LITLEN(";\n"));
-			return;
+		if(cur->nsubs == 1)
+			if(cur->subs[0].c == 0) {
+				indent(level+1);
+				write(1,LITLEN("return "));
+				write(1,tag,dest-tag);
+				write(1,LITLEN(";\n"));
+				return;
+			} else {
+				write(1,LITLEN("if "));
+				writebufi(level-1);
+											 
 		}
 		indent(level);
-		write(1,LITLEN("switch (buf["));
-		char buf[0x100];
-		write(1,buf, snprintf(buf,0x100,"%d",level-1));
-		write(1,LITLEN("]) {\n"));
+
 
 		for(i=0;i<cur->nsubs;++i) {
-			if(cur->subs[i].c) {
-				*dest = toupper(cur->subs[i].c);
-				indent(level+1);
-				write(1,LITLEN("case '"));
-				write(1,&cur->subs[i].c,1);
-				write(1,LITLEN("':"));
-				dump_tag(dest+1, &cur->subs[i],level+1);
-			}
+			*dest = toupper(cur->subs[i].c);
+			indent(level+1);
+			write(1,LITLEN("case '"));
+			write(1,&cur->subs[i].c,1);
+			write(1,LITLEN("':"));
+			dump_tag(dest+1, &cur->subs[i],level+1);
 		}
 		indent(level);
 		write(1,LITLEN("};\n"));
