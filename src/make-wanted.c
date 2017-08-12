@@ -150,11 +150,19 @@ int main(int argc, char *argv[])
 		size_t i;
 		bool first = true;
 		for(i=0;i<cur->nsubs;++i) {
-			*dest = toupper(cur->subs[i].c);
+			char c = cur->subs[i].c;
+			if(!c) {
+				indent(level+1);
+				write(1,LITLEN("return "));
+				write(1,tag,dest-tag);
+				write(1,LITLEN(";\n"));
+				continue;
+			}
+			*dest = toupper(c);
 			indent(level+1);
 			write(1,LITLEN("case '"));
 			write(1,&cur->subs[i].c,1);
-			write(1,LITLEN("':"));
+			write(1,LITLEN("':\n"));
 			dump_tag(dest+1, &cur->subs[i],level+1);
 		}
 		indent(level);
