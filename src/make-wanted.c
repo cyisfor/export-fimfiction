@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
 		int i=0;
 		char* buf = alloca(level);
 		for(i=0;i<level;++i) {
-			buf[i] = ' ';
+			buf[i] = '-';
 		}
 		write(1,buf,level);
 	}
@@ -149,6 +149,11 @@ int main(int argc, char *argv[])
 	void dump_tag(char* dest, struct trie* cur, int level) {
 		size_t i;
 		bool first = true;
+		indent(level);
+		write(1,LITLEN("switch (buf["));
+		writebufi(level-1);
+		write(1,LITLEN("]) {\n"));
+
 		for(i=0;i<cur->nsubs;++i) {
 			char c = cur->subs[i].c;
 			if(!c) {
