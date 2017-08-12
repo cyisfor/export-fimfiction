@@ -1,5 +1,8 @@
 int main(int argc, char *argv[])
 {
+
+#define WANT(what,code)
+	
 	WANT("a", return argTag("url",e.attr("href")));
   WANT("chat", return dumbTag("quote"));
 	WANT("i", return dumbTag("i"));

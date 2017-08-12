@@ -1,113 +1,115 @@
-import wordcount;
+#include "wordcount.h"
+#include "gui.h"
+#include "string.h"
+#include "html_when.h"
 
-import html.dom: createDocument;
-import html.entities: getEntityUTF8;
+#include <libxml/parser.h>
+#include <pcre.h>
 
-import std.experimental.logger: info, infof, warningf, tracef;
+FILE* output = NULL; // = open_memstream(...)
 
-import std.algorithm: min;
-import std.process: environment;
-import std.string: format, strip, toStringz;
-import std.array: appender, Appender;
-import std.conv: to;
+mstring story = {};
+mstring author = {};
+mstring title = {};
 
-extern (C) void guiLoop(const char*, void*, void*);
-extern (C) void refreshRow(int, int, const char*, const char*, const char*);
+pcre* dentpat = NULL; // = regex("&([^;\\s&]+);");
 
-Appender!string dest;
+/* T deEntitize(T)(T inp) { */
+/* 	T replace(Captures!T m) { */
+/* 		auto res = getEntityUTF8(m[1]); */
+/* 		if(res == null) { */
+/* 			throw new Exception(("What is " ~ m[1] ~ "?").to!string); */
+/* 		} */
+/* 		return res; */
+/* 	} */
+/* 	return replaceAll!replace(inp,dentpat); */
+/* } */
 
-void output(T)(T item) {
-	tracef("POOT (%s)",item);
-  dest.put(item);
-}
-
-extern (C) static void invoke(void* ptr, void* funcptr) {
-  void delegate() dg;
-  dg.funcptr = cast(void function())(funcptr);
-  dg.ptr = ptr;
-  dg();
-}
-
-string storyS = null;
-string authorS = null;
-string titleS = null;
-
-import std.regex: regex, Captures, replaceAll;
-
-auto dentpat = regex("&([^;\\s&]+);");
-
-T deEntitize(T)(T inp) {
-	T replace(Captures!T m) {
-		auto res = getEntityUTF8(m[1]);
-		if(res == null) {
-			throw new Exception(("What is " ~ m[1] ~ "?").to!string);
-		}
-		return res;
-	}
-	return replaceAll!replace(inp,dentpat);
-}
-
-extern(C) static immutable(char)* getContents(int i) {
+const string getContents(int i) {
   static immutable(char)* oo;
   string o;
   switch(i) {
   case 0:
-    o = titleS;
+    return *((const string*)&title);
     break;
   case 1:
-    o = storyS;
+		return *((const string*)&story);
     break;
   case 2:
-    o = authorS;
+		return *((const string*)&author);
     break;
   default:
-    throw new Exception(format("Bad index %s",i));
+    ERROR("Bad index %s",i);
   }
-
-  infof("pasting string %d %s",i,o[0..min(20,$)]);
-
-  oo = toStringz(o);
-  return oo;
 }
 
-void process(NodeType)(ref NodeType e) {
+enum wanted_tags { A
+
+void parse(xmlNode* cur, int listitem, int listlevel) {
+	void pnext() {
+		return parse(cur->next,listitem,listlevel);
+	}
 	void pkids() {
-		foreach(ref kid; e.children) {
-			process(kid);
-		}				
+		return parse(cur->children, listordered, listlevel);
 	}
 	void dumbTag(string realname) {
-		output("[" ~ realname ~ "]");
-		if(e.firstChild !is null) {
+		OUTLIT("[");
+		OUTSTR(realname);
+		OUTLIT("]");
+		if(cur->children != NULL) {
 			pkids();
-			output("[/" ~ realname ~ "]");
+			OUTLIT("[/");
+			OUTSTR(realname);
+			OUTLIT("]");
 		}
 	}
-	void argTag(T)(string realname, T arg) {
-		output("[" ~ realname ~ "=" ~ arg ~ "]");
-		pkids();
-		output("[/" ~ realname ~ "]");
+	void argTag(string realname, string arg) {
+		OUTLIT("[");
+		OUTSTR(realname);
+		OUTLIT("=");
+		OUTSTR(arg);
+		OUTLIT("]");
+		if(cur->children != NULL) {
+			pkids();
+			OUTLIT("[/");
+			OUTSTR(realname);
+			OUTLIT("]");
+		}
 	}
 
-	void dolist(bool ordered)() {
-		static if(ordered) {
-			int i = 0;
-		}
-		foreach(ref kid; e.children) {
-			static if(ordered) output((++i).to!string() ~ ") ");
-			else output("• ");
-			auto savedest = dest;
-			dest = appender!string();
-			foreach(ref kkid; kid.children) {
-				// assert(kkid.name == "li")
-				process(kkid);
+	switch(cur->type) {
+	case XML_NODE_ELEMENT: {
+		size_t len = strlen(cur->name);
+#define IS(a) ((LITSIZ(a) == len) && (0 == memcmp(cur->name,a,LITSIZ(a))))
+		if(IS("li")) {
+			int i;
+			for(i=0;i<level;++i) {
+				OUTLIT("  ");
 			}
-			auto item = dest.data;
-			dest = savedest;
-			output(item.strip());
-			output("\n");
-		}
+			if(listitem >= 0) {
+				OUTF("%d",++listitem);
+				OUTLIT(") ");
+			} else {
+				OUTLIT("• ");
+			}
+			// still check children for sublists
+		} else if(IS("ul")) {
+			parse(cur->children,false,listlevel+1);
+		} else if(IS("ol")) {
+			parse(cur->children,true,listlevel+1);
+		} 
 	}
+		// fall-through
+	case XML_NODE_DOCUMENT:
+		pkids();
+		return pnext();
+	case XML_NODE_COMMENT:
+		INFO("comment stripped %s",cur->children->content);
+		return pnext();
+	case XML_NODE_TEXT:
+		parse_text(cur->children);
+		return pnext();
+	};
 	if(e.isTextNode()) {
 		output(deEntitize(e.text));
 		return;
