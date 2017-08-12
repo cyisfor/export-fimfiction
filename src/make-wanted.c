@@ -134,14 +134,13 @@ int main(int argc, char *argv[])
 	char tag[0x100]; // err... 0x100 should be safe-ish.
 	void dump_tag(char* dest, struct trie* cur) {
 		size_t i;
-		for(i=0;i<cur->nsubs;++i) {
-			if(cur->c) {
+		if(cur->c) {
+			for(i=0;i<cur->nsubs;++i) {
 				*dest = cur->c;
 				dump_tag(dest+1, &cur->subs[i]);
-			} else {
-				write(1,tag,dest-tag);
-				write(1,LITLEN(" - \n"));
 			}
+		} else {
+			write(1,tag,dest-tag);
 		}
 	}
 	write(1,LITLEN("enum wanted_tags {"));
@@ -153,7 +152,7 @@ int main(int argc, char *argv[])
 		} else {
 			write(1,LITLEN(",\n\t"));
 		} 
-		dump_tag(&root.subs[i]);
+		dump_tag(tag, &root.subs[i]);
 	}
 	write(1,LITLEN("};\n"));
 }
