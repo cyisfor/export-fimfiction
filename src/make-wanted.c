@@ -1,48 +1,135 @@
+#include <sys/mman.h> // mmap
+#include <sys/stat.h>
+#include <stdlib.h> // size_t
+
+
 int main(int argc, char *argv[])
 {
+	/*
+		enum wanted_tags { A, CHAT, ..., UNWANTED };
 
-#define WANT(what,code)
-	
-	WANT("a", return argTag("url",e.attr("href")));
-  WANT("chat", return dumbTag("quote"));
-	WANT("i", return dumbTag("i"));
-	WANT("b", return dumbTag("b"));
-	WANT("u", return dumbTag("u"));
-	WANT("s", return dumbTag("s"));
-	WANT("hr", return dumbTag("hr"));
-	WANT("blockquote", return dumbTag("quote"));
-	WANT("font", return argTag("color",e.attr("color")));
-	WANT("small", return argTag("size","0.75em"));
-	WANT("ul", return dolist!false());
-	WANT("ol", return dolist!true());
-	WANT("h3", return argTag("size","2em"));
-	WANT("div",
-			 {
-				 xmlChar* attr = xmlGetProp(cur,"class");
-				 if(attr &&
-						strlen(attr) == LITSIZ("spoiler") &&
-						0 == memcmp(attr,LITSIZ("spoiler"))) {
-					 xmlFree(attr);
-					 return dumbTag("spoiler");
-				 }
-				 xmlFree(attr);
-			 });
-	// strip
-	WANT("root", return pkids());
-	WANT("p", return pkids());
-	WANT("title", return pkids());
-	WANT("img", {
-			xmlChar* src = xmlGetProp(cur,"data-fimfiction-src");
-			if(src == NULL) {
-				src = xmlGetProp(cur,"src");
-				if(src == NULL) {
-					WARN("Skipping sourceless image");
-					return;
+		enum wanted_tags lookup_wanted(const char* tag) {
+		  switch(tag[0]) {
+			 case 'a': return A
+			 ...
+			 }
+			 ...
+		}
+
+		switch(lookup_wanted(tag)) {
+		case A:
+		  return argTag("url","href");
+		case CHAT:
+		  return dumbTag("quote");
+		...
+		default:
+		  error("unknown tag! %.*s",tlen,tag);
+		};
+	*/
+
+	struct trie {
+		char c;
+		struct trie* subs;
+		size_t nsubs;
+	};
+
+	struct trie root = {};
+
+	void insert(const char* tag, size_t len) {
+		void visit(struct trie* cur, size_t off) {
+			char c = tag[off];
+			size_t i;
+			// TODO: make subs sorted, and binary search to insert
+			// that'd be faster for LOTS of tags, probably slower otherwise
+			// because mergesort/indirection/etc
+			for(i=0;i<cur->nsubs;++i) {
+				struct trie* sub = &cur->subs[i];
+				if(sub->c == c) {
+					return visit(sub,off+1);
 				}
 			}
-			OUTLIT("[img]");
-			OUTS(src,strlen(src));
-			OUTLIT("[/img]");
-		});
-	return;
+			cur->subs = realloc(cur->subs,sizeof(*cur->subs)*(cur->nsubs+1));
+			cur = &cur->subs[cur->nsubs++];
+			// we don't need to traverse the subs we create. just finish the string here
+			// as children.
+			for(;off<len;++off) {
+				cur->c = c;
+				cur->subs = malloc(sizeof(*cur->subs));
+				cur->nsubs = 1;
+				c = buf[off];
+				cur = &cur->subs[0];
+			}
+			// final one, be sure to null it out
+			cur->subs = NULL;
+			cur->nsubs = 0;
+			return;
+		}
+		return visit(&root, 0);
+	}
+
+	struct stat winfo;
+	assert(0==fstat(0,&winfo));
+	char* src = mmap(NULL,winfo.st_size,PROT_READ,MAP_PRIVATE,0,0);
+	char* cur = src;
+	while(isspace(*cur)) {
+		if(++cur == src + winfo.st_size) {
+			// whitespace file]
+			error(23,0,"only whitespace?");
+		}
+	}
+	for(;;) {
+		// cur should always point to non-whitespace here.
+		char* nl = memchr(cur,'\n',winfo.st_size-(cur-src));
+		if(nl == NULL) {
+			// no newline at the end of file
+			char* naspace = nl-1;
+			if(naspace != cur) {
+				while(isspace(*naspace)) {
+					if(--naspace == cur) break;
+				}
+			}
+			insert(cur,naspace - cur + 1);
+		}
+		cur = nl+1;
+		if(cur == src + winfo.st_size) {
+			// trailing newline
+			break;
+		}
+		while(isspace(*cur)) {
+			if(++cur == src + winfo.st_size) {
+				// trailing whitespace
+				break;
+			}
+		}
+	}
+	munmap(src,winfo.st_size);
+
+	/* aab aac abc ->
+		 a: (a1 b)
+		 a1: (b1 c)
+		 b: (c1)
+
+		 output a, then recurse on a1, a again, then on b
+		 output self, then child, self, then child
+		 -> aabaacabc add separators if at top
+	*/
+	void dump_tag(struct trie* cur) {
+		size_t i;
+		for(i=0;i<cur->nsubs;++i) {
+			write(1,&cur->c,1);
+			dump_tag(&cur->subs[i]);
+		}
+	}
+	write(1,LITLEN("enum wanted_tags {"));
+	size_t i;
+	for(i=0;i<root.nsubs;++i) {
+		// root has no letter
+		if(i == 0) {
+			write(1,LITLEN("\n\t"));
+		} else {
+			write(1,LITLEN(",\n\t"));
+		} 
+		dump_tag(&root->subs[i]);
+	}
+	write(1,LITLEN("};\n"));
 }
