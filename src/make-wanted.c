@@ -131,12 +131,16 @@ int main(int argc, char *argv[])
 		 output self, then child, self, then child
 		 -> aabaacabc add separators if at top
 	*/
-	void dump_tag(struct trie* cur) {
+	char tag[0x100]; // err... 0x100 should be safe-ish.
+	void dump_tag(char* dest, struct trie* cur) {
 		size_t i;
 		for(i=0;i<cur->nsubs;++i) {
 			if(cur->c) {
-				write(1,&cur->c,1);
-				dump_tag(&cur->subs[i]);
+				*dest = cur->c;
+				dump_tag(dest+1, &cur->subs[i]);
+			} else {
+				write(1,tag,dest-tag);
+				write(1,LITLEN(" - \n"));
 			}
 		}
 	}
