@@ -154,19 +154,23 @@ int main(int argc, char *argv[])
 
 		for(i=0;i<cur->nsubs;++i) {
 			char c = cur->subs[i].c;
+			*dest = toupper(c);
+			indent(level+1);
+			write(1,LITLEN("case '"));
+			if(c) {
+				write(1,&c,1);
+			} else {
+				write(1,LITLEN("\\0"));
+			}
+			write(1,LITLEN("':\n"));
 			if(!c) {
 				indent(level+1);
 				write(1,LITLEN("return "));
 				write(1,tag,dest-tag);
 				write(1,LITLEN(";\n"));
-				continue;
+			} else {
+				dump_tag(dest+1, &cur->subs[i],level+1);
 			}
-			*dest = toupper(c);
-			indent(level+1);
-			write(1,LITLEN("case '"));
-			write(1,&cur->subs[i].c,1);
-			write(1,LITLEN("':\n"));
-			dump_tag(dest+1, &cur->subs[i],level+1);
 		}
 		indent(level);
 		write(1,LITLEN("};\n"));
