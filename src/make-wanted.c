@@ -160,9 +160,14 @@ int main(int argc, char *argv[])
 				write(1,LITLEN(";\n"));
 				return;
 			} else {
-				write(1,LITLEN("if "));
+				indent(level);
+				write(1,LITLEN("if ("));
 				writebufi(level-1);
-											 
+				write(1,LITLEN("== '"));
+				write(1,&cur->subs[0].c,1);
+				write(1,LITLEN("') {\n"));
+			}
+		return;
 		}
 		indent(level);
 
