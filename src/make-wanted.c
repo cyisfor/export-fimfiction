@@ -146,9 +146,9 @@ int main(int argc, char *argv[])
 			if(cur->subs[i].c) {
 				*dest = toupper(cur->subs[i].c);
 				write(1,LITLEN("case '"));
-				write(1,&cur->subs[i].c);
+				write(1,&cur->subs[i].c,1);
 				write(1,LITLEN("':"));
-				dump_tag(dest+1, &cur->subs[i]);
+				dump_tag(dest+1, &cur->subs[i],level+1);
 			} else {
 				if(first) {
 					first = false;
@@ -162,6 +162,6 @@ int main(int argc, char *argv[])
 		write(1,LITLEN("};\n"));
 	}
 	write(1,LITLEN("enum wanted_tags {"));
-	dump_tag(tag, &root);
+	dump_tag(tag, &root, 0);
 	write(1,LITLEN("};\n"));
 }
