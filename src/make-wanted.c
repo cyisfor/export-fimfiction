@@ -147,16 +147,24 @@ int main(int argc, char *argv[])
 	}
 
 	void dump_memcmp(char* dest, struct trie* cur, int level) {
-		indent(level);
-		write(1,LITLEN("if(0==strncmp(&buf["));
-		writei(level);
-		write(1,LITLEN("],\""));
-		while(cur && cur->c) {
-			write(1,&cur->c,1);
-			*dest++ = toupper(cur->c);
-			cur = &cur->subs[0];
+		if(cur->subs[0].nsubs == 0) {
+			write(1,LITLEN("if(buf["))
+			writei(level);
+			write(1,"] == '");
+			writei(1,&cur->c,1);
+			write(1,LITLEN("')\n"));
+		} else {
+			indent(level);
+			write(1,LITLEN("if(0==strncmp(&buf["));
+			writei(level);
+			write(1,LITLEN("],\""));
+			while(cur && cur->c) {
+				write(1,&cur->c,1);
+				*dest++ = toupper(cur->c);
+				cur = &cur->subs[0];
+			}
+			write(1,LITLEN("\"))\n"));
 		}
-		write(1,LITLEN("\"))\n"));
 		indent(level+1);
 		write(1,LITLEN("return "));
 		write(1,tag,dest-tag);
