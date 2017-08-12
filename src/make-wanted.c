@@ -145,13 +145,14 @@ int main(int argc, char *argv[])
 		write(1,buf, snprintf(buf,0x100,"%d",i));
 	}
 
-	void dump_memcmp(const char* dest, struct trie* cur, int level) {
+	void dump_memcmp(char* dest, struct trie* cur, int level) {
 		indent(level);
 		write(1,LITLEN("if(0==strncmp(&buf["));
 		writei(level);
 		write(1,LITLEN("],\""));
 		while(cur && cur->c) {
 			write(1,&cur->c,1);
+			*dest++ = toupper(cur->c);
 			cur = &cur->subs[0];
 		}
 		write(1,LITLEN("\"))\n"));
@@ -159,6 +160,12 @@ int main(int argc, char *argv[])
 		write(1,LITLEN("return "));
 		write(1,tag,dest-tag);
 		write(1,LITLEN(";\n"));
+	}
+
+	bool nobranches(struct trie* cur) {
+		if(cur->nsubs > 1) return false;
+		if(cur->nsubs == 0) return true;
+		return nobranches(&cur->nsubs[0]);
 	}
 	
 	void dump_tag(char* dest, struct trie* cur, int level) {
