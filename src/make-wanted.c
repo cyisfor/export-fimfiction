@@ -1,7 +1,13 @@
 #include <sys/mman.h> // mmap
 #include <sys/stat.h>
 #include <stdlib.h> // size_t
+#include <assert.h>
+#include <string.h>
+#include <ctype.h> // isspace
+#include <error.h>
+#include <unistd.h> // write
 
+#define LITLEN(a) a,sizeof(a)-1
 
 int main(int argc, char *argv[])
 {
@@ -56,7 +62,7 @@ int main(int argc, char *argv[])
 				cur->c = c;
 				cur->subs = malloc(sizeof(*cur->subs));
 				cur->nsubs = 1;
-				c = buf[off];
+				c = tag[off];
 				cur = &cur->subs[0];
 			}
 			// final one, be sure to null it out
@@ -129,7 +135,7 @@ int main(int argc, char *argv[])
 		} else {
 			write(1,LITLEN(",\n\t"));
 		} 
-		dump_tag(&root->subs[i]);
+		dump_tag(&root.subs[i]);
 	}
 	write(1,LITLEN("};\n"));
 }
