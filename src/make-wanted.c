@@ -140,18 +140,16 @@ int main(int argc, char *argv[])
 		}
 		write(1,buf,level);
 	}
-	void writebufi(int i) {
-		write(1,LITLEN("buf["));
+	void writei(int i) {
 		char buf[0x100];
 		write(1,buf, snprintf(buf,0x100,"%d",i));
-		write(1,LITLEN("]"));
 	}
 	void dump_tag(char* dest, struct trie* cur, int level) {
 		size_t i;
 		bool first = true;
 		indent(level);
 		write(1,LITLEN("switch (buf["));
-		writebufi(level-1);
+		writei(level);
 		write(1,LITLEN("]) {\n"));
 
 		for(i=0;i<cur->nsubs;++i) {
