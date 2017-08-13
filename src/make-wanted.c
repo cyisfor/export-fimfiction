@@ -132,7 +132,6 @@ int main(int argc, char *argv[])
 		 -> aabaacabc add separators if at top
 	*/
 	char tag[0x100]; // err... 0x100 should be safe-ish.
-	bool first = false;
 	void indent(int level) {
 		int i=0;
 		char* buf = alloca(level);
@@ -225,7 +224,6 @@ int main(int argc, char *argv[])
 	
 	void dump_tag(char* dest, struct trie* cur, int level) {
 		size_t i;
-		bool first = true;
 		indent(level);
 		write(1,LITLEN("switch (buf["));
 		writei(level);
@@ -266,7 +264,27 @@ int main(int argc, char *argv[])
 		indent(level);
 		write(1,LITLEN("};\n"));
 	}
+
+	bool first = true;
+	void dump_enum(char* dest, struct trie* cur) {
+		if(cur->nsubs == 0) {
+			if(first) {
+				first = false;
+			} else {
+				write(1,", ");
+			}
+			write(1,tag,dest-tag);
+		}
+		*dest = cur->c;
+		return dump_enum(dest+1,&cur->subs[0]);
+	}
+	
+	
 	write(1,LITLEN("enum wanted_tags {\n"));
-	dump_tag(tag, &root, 0);
+	dump_enum(tag, &root, 0);
 	write(1,LITLEN("};\n"));
+
+	write(1,LITLEN("enum wanted_tags lookup_wanted(const char* tag) {\n"));
+	dump_tag(tag, &root, 0);
+	write(1,LITLEN("}\n"));
 }
