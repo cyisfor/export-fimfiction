@@ -214,7 +214,7 @@ void main(int argc, char** argv) {
 		html_when(storyE);
 		xmlNode* titleE = get_title(storyE);
 		if(titleE) {
-			info("Found title %s",titleE->children->content);
+			printf("Found title %s",titleE->children->content);
 			title.s = titleE->children->content;
 			// strdup?
 			title.l = strlen(title.s);
