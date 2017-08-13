@@ -43,8 +43,7 @@ static void on_click(GtkButton* button, gpointer udata) {
   gtk_clipboard_set_text(clip,getContents(rows[i].id),-1);
 }
 
-// D calls refreshRow when it's reloaded its stuff
-void refreshRow(int i, int id, const char* name, const char* summary, const char* count) {
+void refreshRow(int i, int id, const char* name, const char* summary, int count) {
   int oldrows = nrows;
   while(nrows<=i) {
     ++nrows;
@@ -79,7 +78,9 @@ void refreshRow(int i, int id, const char* name, const char* summary, const char
   
   gtk_button_set_label(cur->btn, name);
   gtk_label_set_text(cur->label, summary);
-  gtk_label_set_text(cur->counter, count);    
+	char buf[0x100];
+	snprintf(buf,0x100,"%d",count);
+  gtk_label_set_text(cur->counter, buf);    
 }
 
 static void doRefresh(GtkButton* btn, void* udata) {

@@ -203,6 +203,8 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 
 #define PARSE(a) parse(a,-1,0)
 
+#define max(a,b) ((a) < (b) ? (b) : (a))
+
 void main(int argc, char** argv) {
 	// fimfiction is dangerous, so default to censored
 	if(NULL==getenv("uncensored")) {
