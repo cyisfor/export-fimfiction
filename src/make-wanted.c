@@ -150,6 +150,12 @@ int main(int argc, char *argv[])
 		 output self, then child, self, then child
 		 -> aabaacabc add separators if at top
 	*/
+
+	void WRITE(const char* buf, size_t n) {
+		ssize_t res = write(fd,buf,n);
+		assert(res == n);
+	}
+	
 	char tag[0x100]; // err... 0x100 should be safe-ish.
 	void indent(int level) {
 		int i=0;
@@ -157,11 +163,11 @@ int main(int argc, char *argv[])
 		for(i=0;i<level;++i) {
 			buf[i] = '-';
 		}
-		write(1,buf,level);
+		WRITE(buf,level);
 	}
 	void writei(int i) {
 		char buf[0x100];
-		write(1,buf, snprintf(buf,0x100,"%d",i));
+		WRITE(buf, snprintf(buf,0x100,"%d",i));
 	}
 
 	
@@ -169,10 +175,10 @@ int main(int argc, char *argv[])
 		if(!cur) return;
 		indent(level);
 		if(cur->c)
-			write(1,&cur->c,1);
+			WRITE(&cur->c,1);
 		else
-			write(1,LITLEN("\\0"));
-		write(1,"\n",1);
+			WRITE(LITLEN("\\0"));
+		WRITE("\n",1);
 		int i;
 		for(i=0;i<cur->nsubs;++i) {
 			dumptrie(&cur->subs[i],level+1);
@@ -184,52 +190,52 @@ int main(int argc, char *argv[])
 	void dump_memcmp(char* dest, struct trie* cur, int level, int len) {
 		if(cur->nsubs == 0) {
 			indent(level);
-			write(1,LITLEN("return1 "));
-			write(1,tag,dest-tag);
-			write(1,LITLEN(";\n"));
+			WRITE(LITLEN("return1 "));
+			WRITE(tag,dest-tag);
+			WRITE(LITLEN(";\n"));
 			return;
 		}
 		indent(level);
-		write(1,LITLEN("if("));
+		WRITE(LITLEN("if("));
 		switch(len) {
 		case 2:
-			write(1,LITLEN("buf["));
+			WRITE(LITLEN("buf["));
 			writei(level);
-			write(1,LITLEN("] == '"));
-			write(1,&cur->c,1);
+			WRITE(LITLEN("] == '"));
+			WRITE(&cur->c,1);
 			*dest++ = toupper(cur->c);
-			write(1,LITLEN("')\n"));
+			WRITE(LITLEN("')\n"));
 			break;
 		case 3:
-			write(1,LITLEN("buf["));
+			WRITE(LITLEN("buf["));
 			writei(level);
-			write(1,LITLEN("] == '"));
-			write(1,&cur->c,1);
+			WRITE(LITLEN("] == '"));
+			WRITE(&cur->c,1);
 			*dest++ = toupper(cur->c);
-			write(1,LITLEN("' && buf["));
+			WRITE(LITLEN("' && buf["));
 			writei(level+1);
-			write(1,LITLEN("] == '"));
-			write(1,&cur->subs[0].c,1);
+			WRITE(LITLEN("] == '"));
+			WRITE(&cur->subs[0].c,1);
 			*dest++ = toupper(cur->subs[0].c);
-			write(1,LITLEN("')\n"));
+			WRITE(LITLEN("')\n"));
 			break;
 		default:
-			write(1,LITLEN("0==strncmp(&buf["));
+			WRITE(LITLEN("0==strncmp(&buf["));
 			writei(level);
-			write(1,LITLEN("],\""));
+			WRITE(LITLEN("],\""));
 			while(cur && cur->c) {
-				write(1,&cur->c,1);
+				WRITE(&cur->c,1);
 				*dest++ = toupper(cur->c);
 				cur = &cur->subs[0];
 			}
-			write(1,LITLEN("\"))\n"));
+			WRITE(LITLEN("\"))\n"));
 		};
 		indent(level+1);
-		write(1,LITLEN("return2 "));
-		write(1,tag,dest-tag);
-		write(1,LITLEN(";\n"));
+		WRITE(LITLEN("return2 "));
+		WRITE(tag,dest-tag);
+		WRITE(LITLEN(";\n"));
 		indent(level);
-		write(1,LITLEN("return UNKNOWN_TAG;\n"));
+		WRITE(LITLEN("return UNKNOWN_TAG;\n"));
 	}
 
 	bool nobranches(struct trie* cur, int* len) {
@@ -244,28 +250,28 @@ int main(int argc, char *argv[])
 	void dump_tag(char* dest, struct trie* cur, int level) {
 		size_t i;
 		indent(level);
-		write(1,LITLEN("switch (buf["));
+		WRITE(LITLEN("switch (buf["));
 		writei(level);
-		write(1,LITLEN("]) {\n"));
+		WRITE(LITLEN("]) {\n"));
 
 		for(i=0;i<cur->nsubs;++i) {
 			char c = cur->subs[i].c;
 			*dest = toupper(c);
 			indent(level);
-			write(1,LITLEN("case '"));
+			WRITE(LITLEN("case '"));
 			if(c) {
-				write(1,&c,1);
+				WRITE(&c,1);
 			} else {
-				write(1,LITLEN("\\0"));
+				WRITE(LITLEN("\\0"));
 			}
-			write(1,LITLEN("':\n"));
+			WRITE(LITLEN("':\n"));
 			if(!c) {
 				indent(level+1);
-				write(1,LITLEN("return "));
-				write(1,tag,dest-tag);
-				write(1,LITLEN(";\n"));
+				WRITE(LITLEN("return "));
+				WRITE(tag,dest-tag);
+				WRITE(LITLEN(";\n"));
 			} else if(cur->nsubs == 0 || cur->subs[i].nsubs == 0) {
-				write(1,LITLEN("ehunno\n"));
+				WRITE(LITLEN("ehunno\n"));
 			} else {
 				int len = 0;
 				if (nobranches(&cur->subs[i],&len)) {
@@ -277,11 +283,11 @@ int main(int argc, char *argv[])
 			}
 		}
 		indent(level);
-		write(1,LITLEN("default:\n"));
+		WRITE(LITLEN("default:\n"));
 		indent(level+1);
-		write(1,LITLEN("return UNKNOWN_TAG\n"));
+		WRITE(LITLEN("return UNKNOWN_TAG\n"));
 		indent(level);
-		write(1,LITLEN("};\n"));
+		WRITE(LITLEN("};\n"));
 	}
 
 	void dump_enum(char* dest, struct trie* cur) {
@@ -292,18 +298,18 @@ int main(int argc, char *argv[])
 				*dest = toupper(c);
 				dump_enum(dest+1,&cur->subs[i]);
 			} else {
-				write(1,LITLEN(",\n\t"));
-				write(1,tag,dest-tag);
+				WRITE(LITLEN(",\n\t"));
+				WRITE(tag,dest-tag);
 			}
 		}
 	}
 	
 	
-	write(1,LITLEN("enum wanted_tags {\n\tUNKNOWN_TAG"));
+	WRITE(LITLEN("enum wanted_tags {\n\tUNKNOWN_TAG"));
 	dump_enum(tag, &root);
-	write(1,LITLEN("\n};\n"));
+	WRITE(LITLEN("\n};\n"));
 
-	write(1,LITLEN("enum wanted_tags lookup_wanted(const char* tag) {\n"));
+	WRITE(LITLEN("enum wanted_tags lookup_wanted(const char* tag) {\n"));
 	dump_tag(tag, &root, 0);
-	write(1,LITLEN("}\n"));
+	WRITE(LITLEN("}\n"));
 }
