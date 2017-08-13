@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
 	dumptrie(&root,0);
 
 
-	void dump_memcmp(char* dest, struct trie* cur, int level) {
+	void dump_memcmp(char* dest, struct trie* cur, int level, int len) {
 		if(cur->nsubs == 0) {
 			indent(level);
 			write(1,LITLEN("return1 "));
@@ -172,22 +172,40 @@ int main(int argc, char *argv[])
 			return;
 		}
 		if(cur->subs[0].nsubs == 0) {
-			write(1,LITLEN("if(buf["));
-			writei(level);
-			write(1,LITLEN("] == '"));
-			write(1,&cur->c,1);
-			write(1,LITLEN("')\n"));
+
 		} else {
 			indent(level);
-			write(1,LITLEN("if(0==strncmp(&buf["));
-			writei(level);
-			write(1,LITLEN("],\""));
-			while(cur && cur->c) {
+			write(1,LITLEN("if("));
+			switch(len) {
+			case 1:
+				write(1,LITLEN("buf["));
+				writei(level);
+				write(1,LITLEN("] == '"));
 				write(1,&cur->c,1);
-				*dest++ = toupper(cur->c);
-				cur = &cur->subs[0];
-			}
-			write(1,LITLEN("\"))\n"));
+				write(1,LITLEN("')\n"));
+				break;
+			case 2:
+				write(1,LITLEN("buf["));
+				writei(level);
+				write(1,LITLEN("] == '"));
+				write(1,&cur->c,1);
+				write(1,LITLEN("' && buf["));
+				writei(level);
+				write(1,LITLEN("] == '"));
+				write(1,&cur->subs[0].c,1);
+				write(1,LITLEN("')\n"));
+				break;
+			default:
+				write(1,"0==strncmp(&buf[");
+				writei(level);
+				write(1,LITLEN("],\""));
+				while(cur && cur->c) {
+					write(1,&cur->c,1);
+					*dest++ = toupper(cur->c);
+					cur = &cur->subs[0];
+				}
+				write(1,LITLEN("\"))\n"));
+			};
 		}
 		indent(level+1);
 		write(1,LITLEN("return2 "));
@@ -198,10 +216,11 @@ int main(int argc, char *argv[])
 		write(1,LITLEN("return UNKNOWN_TAG;\n"));
 	}
 
-	bool nobranches(struct trie* cur) {
+	bool nobranches(struct trie* cur, int* len) {
 		while(cur) {
 			if(cur->nsubs > 1) return false;
 			if(cur->nsubs == 0) return true;
+			++*len;
 			cur = &cur->subs[0];
 		}
 	}
@@ -232,11 +251,14 @@ int main(int argc, char *argv[])
 				write(1,LITLEN(";\n"));
 			} else if(cur->nsubs == 0 || cur->subs[i].nsubs == 0) {
 				write(1,LITLEN("ehunno\n"));
-			} else if (nobranches(&cur->subs[i])) {
-				*dest = toupper(cur->subs[i].c);
-				dump_memcmp(dest+1,&cur->subs[i].subs[0],level+1);
 			} else {
-				dump_tag(dest+1, &cur->subs[i],level+1);
+				int len = 0;
+				if (nobranches(&cur->subs[i],&len)) {
+					*dest = toupper(cur->subs[i].c);
+					dump_memcmp(dest+1,&cur->subs[i].subs[0],level+1,len);
+				} else {
+					dump_tag(dest+1, &cur->subs[i],level+1);
+				}
 			}
 		}
 		indent(level);
