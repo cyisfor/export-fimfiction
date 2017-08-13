@@ -154,6 +154,7 @@ int main(int argc, char *argv[])
 			write(1,&cur->c,1);
 		else
 			write(1,LITLEN("\\0"));
+		write(1,"\n",1);
 		int i;
 		for(i=0;i<cur->nsubs;++i) {
 			dumptrie(&cur->subs[i],level+1);
