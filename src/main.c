@@ -226,18 +226,22 @@ void main(int argc, char** argv) {
 	const char* source = argv[1];
 
   void recalculate() {
-		xmlDoc* doc = htmlReadFile(source, "UTF-8", HTML_PARSE_RECOVER);
+		xmlDoc* doc = htmlReadFile(source, "UTF-8",
+															 HTML_PARSE_RECOVER |
+															 HTML_PARSE_NOBLANKS |
+															 HTML_PARSE_COMPACT);
+
 		htmlDocDump(stdout,doc);
 		xmlNode* storyE = (xmlNode*)doc;
 		html_when(storyE);
 		xmlNode* titleE = get_title(storyE);
 		if(titleE) {
-			//xmlUnlinkNode(titleE);
+			xmlUnlinkNode(titleE);
 			INFO("Found title %s",titleE->children->content);
 			title.l = strlen(titleE->children->content);
 			title.s = realloc(title.s, title.l);
 			memcpy(title.s, titleE->children->content, title.l);
-			//xmlFreeNode(titleE);
+			xmlFreeNode(titleE);
 		}
 		free(author.s);
 		author.s = NULL;
