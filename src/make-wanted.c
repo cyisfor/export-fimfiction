@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 
 	struct trie {
 		char c;
+		int depth;
 		struct trie* subs;
 		size_t nsubs;
 	};
@@ -59,8 +60,10 @@ int main(int argc, char *argv[])
 			}
 
 			cur->subs = realloc(cur->subs,sizeof(*cur->subs)*(cur->nsubs+1));
+			int olddepth = cur->depth;
 			cur = &cur->subs[cur->nsubs++];
 			cur->c = c;
+			cur->depth = olddepth + 1;
 			// we don't need to traverse the subs we create. just finish the string here
 			// as children.
 			for(++off;off<=len;++off) {
@@ -123,7 +126,9 @@ int main(int argc, char *argv[])
 	munmap(src,winfo.st_size);
 
 	int compare_nodes(struct trie* a, struct trie* b) {
-		return a->c - b->c;
+		if(a->depth == b->depth)
+			return a->c - b->c;
+		return a->depth - b->depth;
 	}
 	
 	void sort_level(struct trie* cur) {
