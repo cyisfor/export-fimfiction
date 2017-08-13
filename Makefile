@@ -27,7 +27,8 @@ o:
 	mkdir o
 
 o/%.o: src/%.c | o
-	gcc $(CFLAGS) `pkg-config --cflags $(P)` -c -o $@ $<
+	gcc -MM $(CFLAGS) `pkg-config --cflags $(P)` -c $<
+	exit 23
 
 o/wanted_tags.gen.c o/wanted_tags.gen.h: | o o/make-wanted
 	cd o && ./make-wanted < ../src/tags.wanted
