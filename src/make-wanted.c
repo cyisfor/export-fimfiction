@@ -232,8 +232,8 @@ int main(int argc, char *argv[])
 			} else if(cur->nsubs == 0 || cur->subs[i].nsubs == 0) {
 				write(1,LITLEN("ehunno\n"));
 			} else if (nobranches(&cur->subs[i])) {
-				*dest++ = toupper(cur->subs[i].c);
-				dump_memcmp(dest,&cur->subs[i].subs[0],level+1);
+				*dest = toupper(cur->subs[i].c);
+				dump_memcmp(dest+1,&cur->subs[i].subs[0],level+1);
 			} else {
 				dump_tag(dest+1, &cur->subs[i],level+1);
 			}
