@@ -222,6 +222,11 @@ int main(int argc, char *argv[])
 			oneshortcut(NULL,0);
 			oneshortcut(LITLEN("' && "));
 			WRITE(LITLEN(")\n"));
+		case 4:
+			oneshortcut(NULL,0);
+			oneshortcut(LITLEN("' && "));
+			oneshortcut(LITLEN("' && "));
+			WRITE(LITLEN(")\n"));
 			break;
 		default:
 			WRITE(LITLEN("0==strncmp(&buf["));
