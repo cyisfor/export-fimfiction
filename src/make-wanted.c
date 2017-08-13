@@ -43,6 +43,19 @@ int main(int argc, char *argv[])
 
 	struct trie root = {};
 
+	void dumptrie(struct trie* cur, int level) {
+		if(!cur) return;
+		indent(level);
+		if(cur->c)
+			write(1,&cur->c,1);
+		else
+			write(1,LITLEN("\\0"));
+		int i;
+		for(i=0;i<cur->nsubs;++i) {
+			dumptrie(&cur->subs[i],level+1);
+		}
+	}
+
 	void insert(const char* tag, size_t len) {
 		void visit(struct trie* cur, size_t off) {
 			char c = (off == len) ? 0 : tag[off];
@@ -122,6 +135,8 @@ int main(int argc, char *argv[])
 	}
 	munmap(src,winfo.st_size);
 
+	dumptrie(&root);
+	
 	/* aab aac abc ->
 		 a: (a1 b)
 		 a1: (b1 c)
@@ -173,6 +188,8 @@ int main(int argc, char *argv[])
 		write(1,LITLEN("return "));
 		write(1,tag,dest-tag);
 		write(1,LITLEN(";\n"));
+		indent(level);
+		write(1,LITLEN("break;\n"));
 	}
 
 	bool nobranches(struct trie* cur) {
