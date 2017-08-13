@@ -22,8 +22,10 @@ html_when/libxml2/configure:
 	cd html_when/libxml2/ && sh autogen.sh
 
 N=make-wanted
-o/make-wanted: $O
+o/make-wanted: o/make-wanted.o
 	$(LINK)
+
+o/make-wanted: LDLIBS=
 
 o:
 	mkdir o
