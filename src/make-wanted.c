@@ -227,12 +227,16 @@ int main(int argc, char *argv[])
 			WRITE(LITLEN("0==strncmp(&buf["));
 			writei(level);
 			WRITE(LITLEN("],\""));
+			int num = 0;
 			while(cur && cur->c) {
 				WRITE(&cur->c,1);
 				*dest++ = toupper(cur->c);
+				++num;
 				cur = &cur->subs[0];
 			}
-			WRITE(LITLEN("\"))\n"));
+			WRITE(LITLEN("\", "));
+			writei(num);
+			WRITE(LITLEN("))\n"));
 		};
 		indent(level+1);
 		WRITE(LITLEN("return "));
