@@ -75,7 +75,8 @@ const string getContents(int i) {
 }
 
 void output_f(const char* s, int l) {
-	fwrite(s,l,1,output);
+	int res = fwrite(s,l,1,output);
+	assert(res == l);
 }
 #define OUTLIT(a) output_f(a,sizeof(a)-1)
 #define OUTSTR(a) output_f(a.s,a.l);
@@ -238,7 +239,7 @@ void main(int argc, char** argv) {
 		free(author.s);
 		author.s = NULL;
 		author.l = 0;
-		fclose(output);
+		if(output) fclose(output);
 		output = open_memstream(&author.s,&author.l);
 		void find_notes(xmlNode* cur) {
 			if(!cur) return;
