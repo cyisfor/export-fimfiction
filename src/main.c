@@ -290,12 +290,12 @@ void main(int argc, char** argv) {
 			wid = max(title.l,wid); // the width of the title but not less than 20
 			// GTK sucks, by the way, so let's waste more cycles copying data again.
 			char* summ = alloca(wid+1);
-			memcpy(summ,story.s,min(wid,story.l));
+			memcpy(summ,title.s,min(wid,title.l));
 			summ[wid] = 0;
       refreshRow(++i,
                  0,
                  "title",
-								 title.s,
+								 summ,
 								 word_count(title.s,title.l));
     }
     if(story.l > 0) {
