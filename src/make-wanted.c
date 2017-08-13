@@ -273,15 +273,16 @@ int main(int argc, char *argv[])
 				*dest = toupper(c);
 				dump_enum(dest+1,&cur->subs[i]);
 			} else {
-				write(1,tag,dest-tag);
 				write(1,LITLEN(",\n\t"));
+				write(1,tag,dest-tag);
 			}
 		}
 	}
 	
-	write(1,LITLEN("enum wanted_tags {\n\t"));
+	
+	write(1,LITLEN("enum wanted_tags {\n\tUNKNOWN_TAG"));
 	dump_enum(tag, &root);
-	write(1,LITLEN("UNKNOWN_TAG\n};\n"));
+	write(1,LITLEN("\n};\n"));
 
 	write(1,LITLEN("enum wanted_tags lookup_wanted(const char* tag) {\n"));
 	dump_tag(tag, &root, 0);
