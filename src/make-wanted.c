@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 		write(1,LITLEN(";\n"));
 	}
 
-	bool nobranches(struct trie* cur) {
+	bool nobranches(struct trie* cur, int* len) {
 		if(cur->nsubs > 1) return false;
 		if(cur->nsubs == 0) return true;
 		return nobranches(&cur->subs[0]);
