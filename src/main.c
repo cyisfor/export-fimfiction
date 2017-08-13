@@ -10,9 +10,9 @@
 
 FILE* output = NULL; // = open_memstream(...)
 
-string story = {};
-string author = {};
-string title = {};
+mstring story = {};
+mstring author = {};
+mstring title = {};
 
 pcre* dentpat = NULL; // = regex("&([^;\\s&]+);");
 
@@ -28,8 +28,6 @@ pcre* dentpat = NULL; // = regex("&([^;\\s&]+);");
 /* } */
 
 const string getContents(int i) {
-  static immutable(char)* oo;
-  string o;
   switch(i) {
   case 0:
     return *((const string*)&title);
