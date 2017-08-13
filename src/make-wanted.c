@@ -239,6 +239,10 @@ int main(int argc, char *argv[])
 			}
 		}
 		indent(level);
+		write(1,LITLEN("default:\n"));
+		indent(level+1);
+		write(1,LITLEN("return UNKNOWN_TAG\n"));
+		indent(level);
 		write(1,LITLEN("};\n"));
 	}
 	write(1,LITLEN("enum wanted_tags {\n"));
