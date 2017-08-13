@@ -81,7 +81,7 @@ void refreshRow(int i, int id, const char* name, const char* summary, const char
 }
 
 static void doRefresh(GtkButton* btn, void* udata) {
-  void (*reload)(void) = void (*)(void)udata;
+  void (*reload)(void) = (void (*)(void))udata;
 	reload();
 }
 
@@ -92,7 +92,7 @@ refreshPathChanged (GFileMonitor     *monitor,
                     GFileMonitorEvent event_type,
                     gpointer          udata) {
   if(event_type == G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT) {
-		void (*reload)(void) = void (*)(void)udata;
+		void (*reload)(void) = (void (*)(void))udata;
 		reload();
   }
 }
@@ -103,7 +103,7 @@ static void setCensored(GtkToggleButton *censored, gpointer udata) {
 	} else {
 		unsetenv("censored");
 	}
-	void (*reload)(void) = void (*)(void)udata;
+	void (*reload)(void) = (void (*)(void))udata;
 	reload();
 }
 

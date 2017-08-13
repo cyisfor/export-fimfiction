@@ -7,7 +7,7 @@ LINK=$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 O=$(patsubst %,o/%.o,$N)
 
-N=gui word main wanted_tags.gen
+N=gui word-count main wanted_tags.gen
 export-fimfiction: $O
 	$(LINK)
 
@@ -16,7 +16,7 @@ o/make-wanted: $O
 	$(LINK)
 
 o:
-	mkdir build
+	mkdir o
 
 o/%.o: src/%.c | o
 	gcc -ggdb `pkg-config --cflags $(P)` -c -o $@ $^
