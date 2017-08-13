@@ -14,6 +14,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include <error.h>
+#include <ctype.h> // isspace
 
 // meh
 #define WARN(a...) error(0,0,"warning: " a)
@@ -192,7 +193,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		}
 			break;
 		default:
-			WARN("Skipping tag %s",cur->name);
+			WARN("Stripping tag %s",cur->name);
 			pkids();
 		}
 		break;
@@ -239,7 +240,6 @@ void main(int argc, char** argv) {
 															 HTML_PARSE_NOBLANKS |
 															 HTML_PARSE_COMPACT);
 
-		htmlDocDump(stdout,doc);
 		xmlNode* storyE = (xmlNode*)doc;
 		html_when(storyE);
 		xmlNode* titleE = get_title(storyE);
