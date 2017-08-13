@@ -164,10 +164,10 @@ int main(int argc, char *argv[])
 	void indent(int level) {
 		int i=0;
 		char* buf = alloca(level);
-		for(i=0;i<level;++i) {
+		for(i=0;i<=level;++i) {
 			buf[i] = '\t';
 		}
-		WRITE(buf,level);
+		WRITE(buf,level+1);
 	}
 	void writei(int i) {
 		char buf[0x100];
