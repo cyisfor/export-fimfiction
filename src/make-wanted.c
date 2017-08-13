@@ -124,6 +124,8 @@ int main(int argc, char *argv[])
 	munmap(src,winfo.st_size);
 
 	// note, CANNOT sort by tag size, since same prefix = different sizes
+	// would have to use "depth" parameter in traversal, to decide between
+	// little or big suffixes first...
 	int compare_nodes(struct trie* a, struct trie* b) {
 		return a->c - b->c;
 	}
@@ -170,8 +172,6 @@ int main(int argc, char *argv[])
 			write(1,&cur->c,1);
 		else
 			write(1,LITLEN("\\0"));
-		write(1,LITLEN(": "));
-		writei(cur->depth);
 		write(1,"\n",1);
 		int i;
 		for(i=0;i<cur->nsubs;++i) {
