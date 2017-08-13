@@ -201,6 +201,8 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 	return parse(cur->next,listitem,listlevel);
 }
 
+#define PARSE(a) parse(a,-1,0)
+
 void main(int argc, char** argv) {
 	// fimfiction is dangerous, so default to censored
 	if(NULL==getenv("uncensored")) {
@@ -235,7 +237,7 @@ void main(int argc, char** argv) {
 				if(lookup_wanted(cur->name) == W_DIV) {
 					xmlChar* val = findProp(cur,"class");
 					if(val && 0==strncmp(val,LITLEN("author"))) {
-						process(cur);
+						PARSE(cur);
 						xmlNode* next = cur->next;
 						xmlUnlinkNode(cur);
 						xmlFreeNode(cur);
@@ -251,7 +253,7 @@ void main(int argc, char** argv) {
 		find_notes(storyE);
 
 		output = open_memstream(&story.s,&story.l);		
-		process(storyE);
+		PARSE(storyE);
 		
 		int i = 0;
 		size_t wid = 20;
