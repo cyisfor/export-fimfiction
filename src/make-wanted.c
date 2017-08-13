@@ -126,11 +126,16 @@ int main(int argc, char *argv[])
 		return a->c - b->c;
 	}
 	
-	void sort_leven(struct trie* cur) {
+	void sort_level(struct trie* cur) {
 		if(cur->nsubs == 0) return;
 
 		qsort(&cur->subs[0],sizeof(cur->subs[0]),cur->nsubs,(void*)compare_nodes);
+		int i;
+		for(i=0;i<cur->nsubs;++i) {
+			sort_level(&cur->subs[i]);
+		}
 	}
+	sort_level(&root);
 
 	/* aab aac abc ->
 		 a: (a1 b)
