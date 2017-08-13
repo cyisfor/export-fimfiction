@@ -204,7 +204,7 @@ int main(int argc, char *argv[])
 		int pos = level;
 		void oneshortcut(const char* prefix, size_t plen) {
 			if(plen) WRITE(prefix,plen);
-			WRITE(LITLEN("buf["));
+			WRITE(LITLEN("tag["));
 			writei(pos++);
 			WRITE(LITLEN("] == '"));
 			WRITE(&place->c,1);
@@ -229,7 +229,7 @@ int main(int argc, char *argv[])
 			WRITE(LITLEN(")\n"));
 			break;
 		default:
-			WRITE(LITLEN("0==strncmp(&buf["));
+			WRITE(LITLEN("0==strncmp(&tag["));
 			writei(level);
 			WRITE(LITLEN("],\""));
 			int num = 0;
@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
 	void dump_tag(char* dest, struct trie* cur, int level) {
 		size_t i;
 		indent(level);
-		WRITE(LITLEN("switch (buf["));
+		WRITE(LITLEN("switch (tag["));
 		writei(level);
 		WRITE(LITLEN("]) {\n"));
 
@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
 	rename(tname,"wanted_tags.gen.h");
 	fd = open(tname,O_WRONLY|O_CREAT|O_TRUNC,0644);
 	assert(fd >= 0);
-	WRITE(LITLEN("#include \"wanted_tags.h\"\n"));
+	WRITE(LITLEN("#include \"wanted_tags.gen.h\"\n"));
 	WRITE(LITLEN("enum wanted_tags lookup_wanted(const char* tag) {\n"));
 	dump_tag(tag, &root, 0);
 	WRITE(LITLEN("}\n"));
