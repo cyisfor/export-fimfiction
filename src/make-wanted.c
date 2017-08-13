@@ -122,6 +122,16 @@ int main(int argc, char *argv[])
 	}
 	munmap(src,winfo.st_size);
 
+	int compare_nodes(struct trie* a, struct trie* b) {
+		return a->c - b->c;
+	}
+	
+	void sort_leven(struct trie* cur) {
+		if(cur->nsubs == 0) return;
+
+		qsort(&cur->subs[0],sizeof(cur->subs[0]),cur->nsubs,compare_nodes);
+	}
+
 	/* aab aac abc ->
 		 a: (a1 b)
 		 a1: (b1 c)
