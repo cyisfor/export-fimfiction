@@ -53,7 +53,8 @@ void output_f(const char* s, int l) {
 }
 #define OUTLIT(a) output_f(a,sizeof(a)-1)
 #define OUTSTR(a) output_f(a.s,a.l);
-#define OUTF(a...) fprintf(output,a)
+#define OUTF(a...) fprintf(output,a)						
+#define OUTS output_f
 
 void parse(xmlNode* cur, int listitem, int listlevel) {
 	void pnext() {
@@ -62,18 +63,19 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 	void pkids() {
 		return parse(cur->children, listitem, listlevel);
 	}
-	void dumbTag(string realname) {
+	void dumbTag(const char* realname, size_t len) {
 		OUTLIT("[");
-		OUTSTR(realname);
+		OUTS(realname,len);
 		OUTLIT("]");
 		if(cur->children != NULL) {
 			pkids();
 			OUTLIT("[/");
-			OUTSTR(realname);
+			OUTS(realname,len);
 			OUTLIT("]");
 		}
 	}
-	void argTag(const char* realname, size_t rlen, const char* arg, size_t alen) {
+	void argTag(const char* realname, size_t rlen, const char* arg) {
+		size_t alen = strlen(arg);
 		OUTLIT("[");
 		OUTS(realname,rlen);
 		OUTLIT("=");
@@ -109,7 +111,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			parse(cur->children,true,listlevel+1);
 		} 		
 		switch(lookup_wanted(cur->name)) {
-		case W_A: return argTag("url",findProp(cur,"href"));
+		case W_A: return argTag(LITLEN("url"),findProp(cur,"href"));
 		case W_CHAT: return dumbTag("quote");
 		case W_I: return dumbTag("i");
 		case W_B: return dumbTag("b");
