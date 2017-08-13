@@ -228,11 +228,11 @@ void main(int argc, char** argv) {
 		free(author.s);
 		author.s = NULL;
 		author.l = 0;
-		dest = open_memstream(&author.s,&author.l);
+		output = open_memstream(&author.s,&author.l);
 		void find_notes(xmlNode* cur) {
 			switch(cur->type) {
 			case XML_ELEMENT_NODE:
-				if(lookup_wanted(cur->name) == DIV) {
+				if(lookup_wanted(cur->name) == W_DIV) {
 					xmlChar* val = findProp(cur,"class");
 					if(val && 0==strncmp(val,LITLEN("author"))) {
 						process(cur);
@@ -250,7 +250,7 @@ void main(int argc, char** argv) {
 		}
 		find_notes(storyE);
 
-		dest = open_memstream(&story.s,&story.l);		
+		output = open_memstream(&story.s,&story.l);		
 		process(storyE);
 		
 		int i = 0;
