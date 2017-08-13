@@ -22,6 +22,22 @@ mstring title = {};
 
 pcre* dentpat = NULL; // = regex("&([^;\\s&]+);");
 
+static xmlNode* get_title(xmlNode* top) {
+	switch(top->type) {
+	case XML_ELEMENT_NODE:
+		if(lookup_wanted(top->name) == W_TITLE) {
+			return top;
+		}
+		// fall through
+	case XML_DOCUMENT_NODE: {
+		xmlNode* found = get_title(top->children);
+		if(found) return found;
+	}
+	};
+
+	return get_title(top->next);
+}
+		
 /* T deEntitize(T)(T inp) { */
 /* 	T replace(Captures!T m) { */
 /* 		auto res = getEntityUTF8(m[1]); */
