@@ -11,6 +11,8 @@ N=gui wordcount main wanted_tags.gen
 export-fimfiction: $O
 	$(LINK)
 
+-include $(patsubst %,o/%.d,$N)
+
 o/main.o: html_when/libxml2/include/libxml/xmlversion.h 
 
 html_when/libxml2/include/libxml/xmlversion.h html_when/libxml2/.libs/libxml2.a: html_when/libxml2/configure
@@ -36,6 +38,8 @@ o/%.d: CFLAGS:=$(CFLAGS) -MM
 o/%.o: src/%.c | o
 	$(COMPILE)
 	exit 23
+
+o/main.d o/main.o: o/wanted_tags.gen.h
 
 o/wanted_tags.gen.c o/wanted_tags.gen.h: | o o/make-wanted
 	cd o && ./make-wanted < ../src/tags.wanted
