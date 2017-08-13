@@ -267,19 +267,20 @@ int main(int argc, char *argv[])
 
 	bool first = true;
 	void dump_enum(char* dest, struct trie* cur) {
-		if(cur->nsubs == 0) {
-			if(first) {
-				first = false;
-			} else {
-				write(1,LITLEN(", "));
-			}
-			write(1,tag,dest-tag);
-			return;
-		}
 		int i = 0;
 		for(;i<cur->nsubs;++i) {
-			*dest = cur->subs[i].c;
-			return dump_enum(dest+1,&cur->subs[i]);
+			char c = cur->subs[i].c;
+			if(c) {
+				*dest = c;
+				return dump_enum(dest+1,&cur->subs[i]);
+			} else {
+				if(first) {
+					first = false;
+				} else {
+					write(1,LITLEN(", "));
+				}
+				write(1,tag,dest-tag);
+			}
 		}
 	}
 	
