@@ -292,7 +292,7 @@ void main(int argc, char** argv) {
     }
     if(author.s != NULL && author.l > 0) {
 			char* summ = alloca(wid+1);
-			memcpy(summ,story.s,min(wid,story.l));
+			memcpy(summ,author.s,min(wid,author.l));
 			summ[wid] = 0;
       refreshRow(++i,
                  2,
