@@ -276,7 +276,7 @@ int main(int argc, char *argv[])
 			} else {
 				if(first) {
 					first = false;
-					write(1,LITLEN("\t"));
+					write(1,LITLEN("\n\t"));
 				} else {
 					write(1,LITLEN(",\n\t"));
 				}
@@ -286,10 +286,10 @@ int main(int argc, char *argv[])
 	}
 	
 	
-	write(1,LITLEN("enum wanted_tags {\n"));
+	write(1,LITLEN("enum wanted_tags {"));
 	dump_enum(tag, &root);
-	write(1,LITLEN("};\n"));
-	return 0;
+	write(1,LITLEN("\n};\n"));
+
 	write(1,LITLEN("enum wanted_tags lookup_wanted(const char* tag) {\n"));
 	dump_tag(tag, &root, 0);
 	write(1,LITLEN("}\n"));
