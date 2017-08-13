@@ -42,7 +42,7 @@ static void on_click(GtkButton* button, gpointer udata) {
   gtk_clipboard_set_text(clip,getContents(rows[i].id),-1);
 }
 
-void refreshRow(int i, int id, const char* name, const char* summary, int count) {
+void refreshRow(int i, int id, const char* name, const char* summary, int slen, int count) {
   int oldrows = nrows;
   while(nrows<=i) {
     ++nrows;

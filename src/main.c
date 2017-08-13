@@ -292,6 +292,7 @@ void main(int argc, char** argv) {
                  0,
                  "title",
 								 title.s,
+								 title.l,
 								 word_count(title.s,title.l));
     }
     if(story.l > 0) {
@@ -302,6 +303,7 @@ void main(int argc, char** argv) {
                  1,
                  "body",
                  summ,
+								 min(wid,story.l),
 								 word_count(story.s,story.l));
     }
     if(author.s != NULL && author.l > 0) {
@@ -312,6 +314,7 @@ void main(int argc, char** argv) {
                  2,
                  "author",
                  summ,
+								 min(wid,author.l),
                  word_count(author.s,author.l));
     }
   }
