@@ -1,3 +1,5 @@
+#include "gui.h"
+
 #include <gtk/gtk.h>
 #include <glib.h>
 
