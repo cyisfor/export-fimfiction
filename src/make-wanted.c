@@ -298,7 +298,7 @@ int main(int argc, char *argv[])
 		indent(level);
 		WRITE(LITLEN("default:\n"));
 		indent(level+1);
-		WRITE(LITLEN("return UNKNOWN_TAG\n"));
+		WRITE(LITLEN("return UNKNOWN_TAG;\n"));
 		indent(level);
 		WRITE(LITLEN("};\n"));
 	}
@@ -330,6 +330,7 @@ int main(int argc, char *argv[])
 	fd = open(tname,O_WRONLY|O_CREAT|O_TRUNC,0644);
 	assert(fd >= 0);
 	WRITE(LITLEN("#include \"wanted_tags.gen.h\"\n"));
+		WRITE(LITLEN("#include <string.h> // strncmp\n"));
 	WRITE(LITLEN("enum wanted_tags lookup_wanted(const char* tag) {\n"));
 	dump_tag(tag, &root, 0);
 	WRITE(LITLEN("}\n"));
