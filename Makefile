@@ -1,13 +1,13 @@
 CFLAGS+=-Io -Ihtml_when/source -Ihtml_when/libxml2/include
 P=gtk+-3.0 glib-2.0 gio-2.0
 
-LDLIBS+=$(shell pkg-config --libs $P) html_when/libxml2/.libs/libxml2.a
+LDLIBS+=$(shell pkg-config --libs $P) html_when/libxml2/.libs/libxml2.a -lpcre
 
 LINK=$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 O=$(patsubst %,o/%.o,$N)
 
-N=gui word-count main wanted_tags.gen
+N=gui wordcount main wanted_tags.gen
 export-fimfiction: $O
 	$(LINK)
 

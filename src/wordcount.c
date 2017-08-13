@@ -1,8 +1,9 @@
 #include "wordcount.h"
 #include <pcre.h>
+#include <assert.h>
 
 #define connectors "’'_–-"
-#define letter = "\\w"
+#define letter "\\w"
 
 #define word "[" letter "][" letter connectors "]+|[IaA]"
 
@@ -14,7 +15,7 @@ void wordcount_setup(void) {
 	int erroffset = 0;
 	pat = pcre_compile(word,
 										 0,
-										 &err,&erroff,
+										 &err,&erroffset,
 										 NULL);
 	assert(pat);
 	study = pcre_study(pat, PCRE_JIT_COMPILE,&err);
