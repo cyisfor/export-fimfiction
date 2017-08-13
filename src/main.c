@@ -202,8 +202,8 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		WARN("comment stripped %s",cur->children->content);
 		break;
 	case XML_TEXT_NODE:
-		if(cur->children) {
-			OUTS(cur->children->content,strlen(cur->children->content));
+		if(cur->content) {
+			OUTS(cur->content,strlen(cur->content));
 		}
 		break;
 	};
@@ -263,7 +263,7 @@ void main(int argc, char** argv) {
 		}
 		find_notes(storyE);
 		fclose(output);
-		output = open_memstream(&story.s,&story.l);		
+		output = open_memstream(&story.s,&story.l);
 		PARSE(storyE);
 		fclose(output);
 		output = NULL;
