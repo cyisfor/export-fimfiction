@@ -276,8 +276,11 @@ int main(int argc, char *argv[])
 			write(1,tag,dest-tag);
 			return;
 		}
-		*dest = cur->c;
-		return dump_enum(dest+1,&cur->subs[0]);
+		int i = 0;
+		for(;i<cur->nsubs;++i) {
+			*dest = cur->subs[i].c;
+			return dump_enum(dest+1,&cur->subs[i]);
+		}
 	}
 	
 	
