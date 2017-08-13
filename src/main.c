@@ -9,6 +9,7 @@
 #include <pcre.h>
 #include <error.h>
 #include <string.h>
+#include <stdbool.h>
 
 FILE* output = NULL; // = open_memstream(...)
 
@@ -50,6 +51,7 @@ void output_f(const char* s, int l) {
 }
 #define OUTLIT(a) output_f(a,sizeof(a)-1)
 #define OUTSTR(a) output_f(a.s,a.l);
+#define OUTF(a...) fprintf(output,a)
 
 void parse(xmlNode* cur, int listitem, int listlevel) {
 	void pnext() {
@@ -89,7 +91,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 #define IS(a) ((LITSIZ(a) == len) && (0 == memcmp(cur->name,a,LITSIZ(a))))
 		if(IS("li")) {
 			int i;
-			for(i=0;i<level;++i) {
+			for(i=0;i<listlevel;++i) {
 				OUTLIT("  ");
 			}
 			if(listitem >= 0) {
@@ -104,7 +106,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		} else if(IS("ol")) {
 			parse(cur->children,true,listlevel+1);
 		} 		
-		switch(lookup_wanted(e.tag)) {
+		switch(lookup_wanted(cur->name)) {
 		case W_A: return argTag("url",findProp(cur,"href"));
 		case W_CHAT: return dumbTag("quote");
 		case W_I: return dumbTag("i");
