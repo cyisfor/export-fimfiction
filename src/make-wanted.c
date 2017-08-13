@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
 	void dump_memcmp(char* dest, struct trie* cur, int level, int len) {
 		if(cur->nsubs == 0) {
 			indent(level);
-			WRITE(LITLEN("return "));
+			WRITE(LITLEN("return W_"));
 			WRITE(tag,dest-tag);
 			WRITE(LITLEN(";\n"));
 			return;
@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
 			WRITE(LITLEN("))\n"));
 		};
 		indent(level+1);
-		WRITE(LITLEN("return "));
+		WRITE(LITLEN("return W_"));
 		WRITE(tag,dest-tag);
 		WRITE(LITLEN(";\n"));
 		indent(level);
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
 			WRITE(LITLEN("':\n"));
 			if(!c) {
 				indent(level+1);
-				WRITE(LITLEN("return "));
+				WRITE(LITLEN("return W_"));
 				WRITE(tag,dest-tag);
 				WRITE(LITLEN(";\n"));
 			} else if(cur->nsubs == 0 || cur->subs[i].nsubs == 0) {
@@ -312,7 +312,7 @@ int main(int argc, char *argv[])
 				*dest = toupper(c);
 				dump_enum(dest+1,&cur->subs[i]);
 			} else {
-				WRITE(LITLEN(",\n\t"));
+				WRITE(LITLEN(",\n\tW_"));
 				WRITE(tag,dest-tag);
 			}
 		}
