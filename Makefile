@@ -1,24 +1,26 @@
-LIBS=gtk+-3.0 glib-2.0 gio-2.0
+CFLAGS+=
+P=gtk+-3.0 glib-2.0 gio-2.0 libxml2
 
-all: stuff
-	dub build -v
+LDLIBS+=$(shell pkg-config --libs $P)
 
-stuff: source/declassifier.d build/gui.o | build
+LINK=$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-build:
+O=$(patsubst %.c,%.o,$N)
+
+N=gui word main wanted_tags.gen
+export-fimfiction: $O
+	$(LINK)
+
+o:
 	mkdir build
 
-build/%.o: source/%.c | build
-	gcc -ggdb `pkg-config --cflags $(LIBS)` -c -o $@ $^
+o/%.o: source/%.c | o
+	gcc -ggdb `pkg-config --cflags $(P)` -c -o $@ $^
 
-build/declassifier.d: build/declassifyGen | build
-	./build/declassifyGen > $@.temp
-	mv $@.temp $@
-
-build/declassifyGen: gen/declassifyGen.d | build
-	dmd -of$@ $^
+o/wanted_tags.gen.c o/wanted_tags.gen.h: | o o/make-wanted
+	cd o && ./make-wanted < ../src/tags.wanted
 
 clean:
-	rm -rf build .dub
+	rm -rf o
 
 .PHONY: all stuff
