@@ -155,6 +155,7 @@ int main(int argc, char *argv[])
 
 	void WRITE(const char* buf, size_t n) {
 		ssize_t res = write(fd,buf,n);
+		perror("umm");
 		assert(res == n);
 	}
 	
@@ -186,7 +187,7 @@ int main(int argc, char *argv[])
 			dumptrie(&cur->subs[i],level+1);
 		}
 	}
-	dumptrie(&root,0);
+	//dumptrie(&root,0);
 
 
 	void dump_memcmp(char* dest, struct trie* cur, int level, int len) {
@@ -308,14 +309,16 @@ int main(int argc, char *argv[])
 
 	char tname[] = ".tmpXXXXXX";
 	fd = mkstemp(tname);
+	assert(fd >= 0);
 	WRITE(LITLEN("enum wanted_tags {\n\tUNKNOWN_TAG"));
 	dump_enum(tag, &root);
 	WRITE(LITLEN("\n};\n"));
 	WRITE(LITLEN("enum wanted_tags lookup_wanted(const char* tag);\n"));
+	
 	close(fd);
 	rename(tname,"wanted_tags.gen.h");
-
 	fd = mkstemp(tname);
+	assert(fd >= 0);
 	WRITE(LITLEN("#include \"wanted_tags.h\"\n"));
 	WRITE(LITLEN("enum wanted_tags lookup_wanted(const char* tag) {\n"));
 	dump_tag(tag, &root, 0);
