@@ -3,7 +3,7 @@
 #include "string.h"
 #include "html_when.h"
 
-#include "wanted_tags.h"
+#include "wanted_tags.gen.h"
 
 #include <libxml/parser.h>
 #include <pcre.h>
