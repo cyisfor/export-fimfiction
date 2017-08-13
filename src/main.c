@@ -1,3 +1,5 @@
+#include "libxmlfixes.h"
+
 #include "wordcount.h"
 #include "gui.h"
 #include "string.h"
