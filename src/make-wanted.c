@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
 	void dump_memcmp(char* dest, struct trie* cur, int level) {
 		if(cur->nsubs == 0) {
 			indent(level);
-			write(1,LITLEN("return "));
+			write(1,LITLEN("return1 "));
 			write(1,tag,dest-tag);
 			write(1,LITLEN(";\n"));
 			return;
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
 			write(1,LITLEN("\"))\n"));
 		}
 		indent(level+1);
-		write(1,LITLEN("return "));
+		write(1,LITLEN("return2 "));
 		write(1,tag,dest-tag);
 		write(1,LITLEN(";\n"));
 		indent(level);
