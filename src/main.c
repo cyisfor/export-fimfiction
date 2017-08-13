@@ -226,9 +226,7 @@ void main(int argc, char** argv) {
 	const char* source = argv[1];
 
   void recalculate() {
-		xmlDoc* doc = htmlReadFile(source, "UTF-8",
-															 HTML_PARSE_RECOVER |
-															 HTML_PARSE_NOIMPLIED);
+		xmlDoc* doc = htmlReadFile(source, "UTF-8", HTML_PARSE_RECOVER);
 		htmlDocDump(stdout,doc);
 		xmlNode* storyE = (xmlNode*)doc;
 		html_when(storyE);
