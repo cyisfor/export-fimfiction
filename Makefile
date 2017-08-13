@@ -40,7 +40,7 @@ o/%.o: src/%.c | o
 
 o/main.d o/main.o: o/wanted_tags.gen.h
 
-o/wanted_tags.gen.c o/wanted_tags.gen.h: | o o/make-wanted
+o/wanted_tags.gen.c o/wanted_tags.gen.h: o/make-wanted src/tags.wanted | o 
 	cd o && ./make-wanted < ../src/tags.wanted
 
 clean:

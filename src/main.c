@@ -89,7 +89,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			OUTLIT("]");
 		}
 	}
-#define argTag(a,arg) ArgTagderp(a,sizeof(a)-1,arg)
+#define argTag(a,arg) argTagderp(a,sizeof(a)-1,arg)
 	
 	switch(cur->type) {
 	case XML_ELEMENT_NODE: {
