@@ -5,13 +5,18 @@ LDLIBS+=$(shell pkg-config --libs $P) -lpcre
 LDLIBS+=$(shell xml2-config --libs | sed -e's/-xml2//g')
 LINK=$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-O=$(patsubst %,o/%.o,$N) html_when/libxml2/.libs/libxml2.a
+O=$(patsubst %,o/%.o,$N) html_when/libxml2/.libs/libxml2.a html_when/libhtmlwhen.a
 
 N=gui wordcount main wanted_tags.gen
 export-fimfiction: $O
 	$(LINK)
 
 -include $(patsubst %,o/%.d,$N)
+
+
+html_when/libhtmlwhen.a:
+	$(MAKE) -C html_when
+.PHONY: html_when/libhtmlwhen.a
 
 o/main.o: html_when/libxml2/include/libxml/xmlversion.h 
 
