@@ -1,15 +1,21 @@
 CFLAGS+=-Io -Ihtml_when/source -Ihtml_when/libxml2/include
 P=gtk+-3.0 glib-2.0 gio-2.0
 
-LDLIBS+=$(shell pkg-config --libs $P) html_when/libxml2/.libs/libxml2.a -lpcre
+LDLIBS+=$(shell pkg-config --libs $P) -lpcre
 
 LINK=$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-O=$(patsubst %,o/%.o,$N)
+O=$(patsubst %,o/%.o,$N) html_when/libxml2/.libs/libxml2.a
 
 N=gui wordcount main wanted_tags.gen
 export-fimfiction: $O
 	$(LINK)
+
+html_when/libxml2/.libs/libxml2.a: html_when/libxml2/configure
+	cd html_when/libxml2/ && make
+
+html_when/libxml2/configure:
+	cd html_when/libxml2/ && sh autogen.sh
 
 N=make-wanted
 o/make-wanted: $O
