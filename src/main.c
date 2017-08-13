@@ -38,7 +38,9 @@ static xmlNode* get_title(xmlNode* top) {
 			return top;
 		}
 		// fall through
-	case XML_DOCUMENT_NODE: {
+	case XML_DOCUMENT_NODE:
+	case XML_HTML_DOCUMENT_NODE: // libxml!!!
+	{
 		xmlNode* found = get_title(top->children);
 		if(found) return found;
 	}
