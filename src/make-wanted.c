@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
 	WRITE(LITLEN("enum wanted_tags {\n\tUNKNOWN_TAG"));
 	dump_enum(tag, &root);
 	WRITE(LITLEN("\n};\n"));
-	WRITE("enum wanted_tags lookup_wanted(const char* tag);\n");
+	WRITE(LITLEN("enum wanted_tags lookup_wanted(const char* tag);\n"));
 	close(fd);
 	rename(tname,"wanted_tags.gen.h");
 
