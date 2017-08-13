@@ -8,6 +8,7 @@
 #include <unistd.h> // write
 #include <stdbool.h>
 #include <stdio.h> // snprintf
+#include <fcntl.h> // open O_*
 
 #define LITLEN(a) a,sizeof(a)-1
 
@@ -164,7 +165,7 @@ int main(int argc, char *argv[])
 		int i=0;
 		char* buf = alloca(level);
 		for(i=0;i<level;++i) {
-			buf[i] = '-';
+			buf[i] = '\t';
 		}
 		WRITE(buf,level);
 	}
@@ -317,7 +318,7 @@ int main(int argc, char *argv[])
 	
 	close(fd);
 	rename(tname,"wanted_tags.gen.h");
-	fd = mkstemp(tname);
+	fd = open(tname,O_WRONLY|O_CREAT|O_TRUNC,0644);
 	assert(fd >= 0);
 	WRITE(LITLEN("#include \"wanted_tags.h\"\n"));
 	WRITE(LITLEN("enum wanted_tags lookup_wanted(const char* tag) {\n"));
