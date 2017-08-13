@@ -193,8 +193,10 @@ int main(int argc, char *argv[])
 		write(1,LITLEN("return2 "));
 		write(1,tag,dest-tag);
 		write(1,LITLEN(";\n"));
+		// pass through to default that does this
 		indent(level);
-		write(1,LITLEN("break;\n"));
+		write(1,LITLEN("// passthru\n"));
+		//write(1,LITLEN("return UNKNOWN_TAG;\n"));
 	}
 
 	bool nobranches(struct trie* cur) {
