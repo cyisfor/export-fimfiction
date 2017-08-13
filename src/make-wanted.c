@@ -165,7 +165,10 @@ int main(int argc, char *argv[])
 
 	void dump_memcmp(char* dest, struct trie* cur, int level) {
 		if(cur->nsubs == 0) {
-			write(1,LITLEN("derp\n"));
+			indent(level);
+			write(1,LITLEN("return "));
+			write(1,tag,dest-tag);
+			write(1,LITLEN(";\n"));
 			return;
 		}
 		if(cur->subs[0].nsubs == 0) {
