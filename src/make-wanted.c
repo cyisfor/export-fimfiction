@@ -171,47 +171,44 @@ int main(int argc, char *argv[])
 			write(1,LITLEN(";\n"));
 			return;
 		}
-		if(cur->subs[0].nsubs == 0) {
-
-		} else {
-			indent(level);
-			write(1,LITLEN("if("));
-			switch(len) {
-			case 2:
-				write(1,LITLEN("buf["));
-				writei(level);
-				write(1,LITLEN("] == '"));
+		indent(level);
+		write(1,LITLEN("if("));
+		switch(len) {
+		case 2:
+			write(1,LITLEN("buf["));
+			writei(level);
+			write(1,LITLEN("] == '"));
+			write(1,&cur->c,1);
+			write(1,LITLEN("')\n"));
+			break;
+		case 3:
+			write(1,LITLEN("buf["));
+			writei(level);
+			write(1,LITLEN("] == '"));
+			write(1,&cur->c,1);
+			*dest++ = cur->c;
+			write(1,LITLEN("' && buf["));
+			writei(level+1);
+			write(1,LITLEN("] == '"));
+			write(1,&cur->subs[0].c,1);
+			*dest++ = cur->subs[0].c;
+			write(1,LITLEN("')\n"));
+			break;
+		default:
+			write(1,LITLEN("0==strncmp(&buf["));
+			writei(level);
+			write(1,LITLEN("],\""));
+			while(cur && cur->c) {
 				write(1,&cur->c,1);
-				write(1,LITLEN("')\n"));
-				break;
-			case 3:
-				write(1,LITLEN("buf["));
-				writei(level);
-				write(1,LITLEN("] == '"));
-				write(1,&cur->c,1);
-				write(1,LITLEN("' && buf["));
-				writei(level+1);
-				write(1,LITLEN("] == '"));
-				write(1,&cur->subs[0].c,1);
-				write(1,LITLEN("')\n"));
-				break;
-			default:
-				write(1,LITLEN("0==strncmp(&buf["));
-				writei(level);
-				write(1,LITLEN("],\""));
-				while(cur && cur->c) {
-					write(1,&cur->c,1);
-					*dest++ = toupper(cur->c);
-					cur = &cur->subs[0];
-				}
-				write(1,LITLEN("\"))\n"));
-			};
-		}
+				*dest++ = toupper(cur->c);
+				cur = &cur->subs[0];
+			}
+			write(1,LITLEN("\"))\n"));
+		};
 		indent(level+1);
 		write(1,LITLEN("return2 "));
 		write(1,tag,dest-tag);
 		write(1,LITLEN(";\n"));
-		// pass through to default that does this
 		indent(level);
 		write(1,LITLEN("return UNKNOWN_TAG;\n"));
 	}
