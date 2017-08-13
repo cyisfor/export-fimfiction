@@ -97,10 +97,10 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		switch(lookup_wanted(cur->name)) {
 		case W_UL:
 			parse(cur->children,-1,listlevel+1);
-			return parse(cur->next,listitem,listlevel);
+			break;
 		case W_OL:
 			parse(cur->children,0,listlevel+1);
-			return parse(cur->next,listitem,listlevel);
+			break;
 		case W_LI: {
 			int i;
 			for(i=0;i<listlevel;++i) {
@@ -113,32 +113,43 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 				OUTLIT("• ");
 			}
 			// still check children for sublists
+			pkids();
+			break;
 		}
 
-		case W_A: return argTag("url",findProp(cur,"href"));
-		case W_CHAT: return dumbTag("quote");
-		case W_I: return dumbTag("i");
-		case W_B: return dumbTag("b");
-		case W_U: return dumbTag("u");
-		case W_S: return dumbTag("s");
-		case W_HR: return dumbTag("hr");
-		case W_BLOCKQUOTE: return dumbTag("quote");
-		case W_FONT: return parse(cur->
-		case W_SMALL: return argTag("size","0.75em");
-		case W_UL: return dolist!false();
-		case W_OL: return dolist!true();
-		case W_H3: return argTag("size","2em");
+		case W_A: argTag("url",findProp(cur,"href"));
+			break;
+		case W_CHAT:  dumbTag("quote");
+			break;
+		case W_I: dumbTag("i");
+			break;
+		case W_B: dumbTag("b");
+			break;
+		case W_U: dumbTag("u");
+			break;
+		case W_S: dumbTag("s");
+			break;
+		case W_HR: dumbTag("hr");
+			break;
+		case W_BLOCKQUOTE: dumbTag("quote");
+			break;
+		case W_FONT: argTag("color",findProp(cur,"color"));
+			break;
+		case W_SMALL: argTag("size","0.75em");
+			break;
+		case W_H3: argTag("size","2em");
+			break;
 		case DIV: {
 			if(0==strncmp(findProp(cur,"class"),LITLEN("spoiler"))) :
 				return dumbTag("spoiler");
-			return;
 		}
+			break;
 		case W_ROOT:
 		case W_P:
 		case W_TITLE:
 			// strip
 			pkids();
-			return pnext();
+			break;
 		case W_IMG:
 			const char* src = findProp(cur,"data-fimfiction-src");
 			if(src == NULL) {
@@ -151,10 +162,11 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			OUTLIT("[img]");
 			OUTS(src, strlen(src));
 			OUTLIT("[/img]");
-			return;
+			break;
 		default:
 			warningf("Skipping tag %s",cur->name);
 		}
+		return pnext();
 	}
 	};
 	// fall-through
