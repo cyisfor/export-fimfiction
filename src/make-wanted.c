@@ -179,6 +179,7 @@ int main(int argc, char *argv[])
 			writei(level);
 			write(1,LITLEN("] == '"));
 			write(1,&cur->c,1);
+			*dest++ = toupper(cur->c);
 			write(1,LITLEN("')\n"));
 			break;
 		case 3:
@@ -186,12 +187,12 @@ int main(int argc, char *argv[])
 			writei(level);
 			write(1,LITLEN("] == '"));
 			write(1,&cur->c,1);
-			*dest++ = cur->c;
+			*dest++ = toupper(cur->c);
 			write(1,LITLEN("' && buf["));
 			writei(level+1);
 			write(1,LITLEN("] == '"));
 			write(1,&cur->subs[0].c,1);
-			*dest++ = cur->subs[0].c;
+			*dest++ = toupper(cur->subs[0].c);
 			write(1,LITLEN("')\n"));
 			break;
 		default:
