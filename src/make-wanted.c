@@ -220,12 +220,13 @@ int main(int argc, char *argv[])
 			break;
 		case 3:
 			oneshortcut(NULL,0);
-			oneshortcut(LITLEN("' && "));
+			oneshortcut(LITLEN(" && "));
 			WRITE(LITLEN(")\n"));
+			break;
 		case 4:
 			oneshortcut(NULL,0);
-			oneshortcut(LITLEN("' && "));
-			oneshortcut(LITLEN("' && "));
+			oneshortcut(LITLEN(" && "));
+			oneshortcut(LITLEN(" && "));
 			WRITE(LITLEN(")\n"));
 			break;
 		default:
