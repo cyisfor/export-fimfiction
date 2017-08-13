@@ -19,6 +19,8 @@
 #define WARN(a...) error(0,0,"warning: " a)
 #define INFO(a...) error(0,0,"info: " a)
 
+#define max(a,b) ((a) < (b) ? (b) : (a))
+#define min(a,b) ((a) > (b) ? (b) : (a))
 
 FILE* output = NULL; // = open_memstream(...)
 
@@ -203,8 +205,6 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 
 #define PARSE(a) parse(a,-1,0)
 
-#define max(a,b) ((a) < (b) ? (b) : (a))
-
 void main(int argc, char** argv) {
 	// fimfiction is dangerous, so default to censored
 	if(NULL==getenv("uncensored")) {
@@ -265,7 +265,6 @@ void main(int argc, char** argv) {
                  0,
                  "title",
 								 title.s,
-								 title.l,
 								 word_count(title.s,title.l));
     }
     if(story.l > 0) {
