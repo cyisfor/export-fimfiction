@@ -237,6 +237,7 @@ void main(int argc, char** argv) {
   void recalculate() {
 		xmlDoc* doc = htmlReadFile(source, "UTF-8",
 															 HTML_PARSE_RECOVER |
+															 HTML_PARSE_NOERROR |
 															 HTML_PARSE_NOBLANKS |
 															 HTML_PARSE_COMPACT);
 
