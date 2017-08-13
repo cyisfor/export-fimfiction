@@ -76,7 +76,7 @@ const string getContents(int i) {
 
 void output_f(const char* s, int l) {
 	int res = fwrite(s,l,1,output);
-	assert(res == l);
+	assert(res == 1);
 }
 #define OUTLIT(a) output_f(a,sizeof(a)-1)
 #define OUTSTR(a) output_f(a.s,a.l);
@@ -265,7 +265,8 @@ void main(int argc, char** argv) {
 		fclose(output);
 		output = open_memstream(&story.s,&story.l);		
 		PARSE(storyE);
-		
+		fclose(output);
+		output = NULL;
 		int i = 0;
 		size_t wid = 20;
     if(title.s != NULL && title.l > 0) {
