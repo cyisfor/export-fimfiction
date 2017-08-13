@@ -176,9 +176,12 @@ int main(int argc, char *argv[])
 	}
 
 	bool nobranches(struct trie* cur, int* len) {
-		if(cur->nsubs > 1) return false;
-		if(cur->nsubs == 0) return true;
-		return nobranches(&cur->subs[0]);
+		while(cur) {
+			if(cur->nsubs > 1) return false;
+			if(cur->nsubs == 0) return true;
+			++*len;
+			cur = &cur->subs[0];
+		}
 	}
 	
 	void dump_tag(char* dest, struct trie* cur, int level) {
@@ -207,11 +210,14 @@ int main(int argc, char *argv[])
 				write(1,LITLEN(";\n"));
 			} else if(cur->nsubs == 0 || cur->subs[i].nsubs == 0) {
 				write(1,LITLEN("ehunno\n"));
-			} else if (nobranches(&cur->subs[i])) {
-				*dest++ = toupper(cur->subs[i].c);
-				dump_memcmp(dest,&cur->subs[i].subs[0],level+1);
 			} else {
-				dump_tag(dest+1, &cur->subs[i],level+1);
+				int len = 0;
+				if (nobranches(&cur->subs[i],&len)) {
+					*dest++ = toupper(cur->subs[i].c);
+					dump_memcmp(dest,&cur->subs[i].subs[0],level+1,len);
+				} else {
+					dump_tag(dest+1, &cur->subs[i],level+1);
+				}
 			}
 		}
 		indent(level);
