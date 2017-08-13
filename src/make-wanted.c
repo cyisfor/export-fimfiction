@@ -151,6 +151,8 @@ int main(int argc, char *argv[])
 		 -> aabaacabc add separators if at top
 	*/
 
+	int fd = -1;
+
 	void WRITE(const char* buf, size_t n) {
 		ssize_t res = write(fd,buf,n);
 		assert(res == n);
@@ -303,13 +305,22 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
-	
-	
+
+	char tname[] = ".tmpXXXXXX";
+	fd = mkstemp(tname);
 	WRITE(LITLEN("enum wanted_tags {\n\tUNKNOWN_TAG"));
 	dump_enum(tag, &root);
 	WRITE(LITLEN("\n};\n"));
+	WRITE("enum wanted_tags lookup_wanted(const char* tag);\n");
+	close(fd);
+	rename(tname,"wanted_tags.gen.h");
 
+	fd = mkstemp(tname);
+	WRITE(LITLEN("#include \"wanted_tags.h\"\n"));
 	WRITE(LITLEN("enum wanted_tags lookup_wanted(const char* tag) {\n"));
 	dump_tag(tag, &root, 0);
 	WRITE(LITLEN("}\n"));
+	close(fd);
+	rename(tname,"wanted_tags.gen.c");
+
 }
