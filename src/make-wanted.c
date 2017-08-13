@@ -43,19 +43,6 @@ int main(int argc, char *argv[])
 
 	struct trie root = {};
 
-	void dumptrie(struct trie* cur, int level) {
-		if(!cur) return;
-		indent(level);
-		if(cur->c)
-			write(1,&cur->c,1);
-		else
-			write(1,LITLEN("\\0"));
-		int i;
-		for(i=0;i<cur->nsubs;++i) {
-			dumptrie(&cur->subs[i],level+1);
-		}
-	}
-
 	void insert(const char* tag, size_t len) {
 		void visit(struct trie* cur, size_t off) {
 			char c = (off == len) ? 0 : tag[off];
@@ -135,8 +122,6 @@ int main(int argc, char *argv[])
 	}
 	munmap(src,winfo.st_size);
 
-	dumptrie(&root);
-	
 	/* aab aac abc ->
 		 a: (a1 b)
 		 a1: (b1 c)
@@ -160,6 +145,22 @@ int main(int argc, char *argv[])
 		char buf[0x100];
 		write(1,buf, snprintf(buf,0x100,"%d",i));
 	}
+
+	
+	void dumptrie(struct trie* cur, int level) {
+		if(!cur) return;
+		indent(level);
+		if(cur->c)
+			write(1,&cur->c,1);
+		else
+			write(1,LITLEN("\\0"));
+		int i;
+		for(i=0;i<cur->nsubs;++i) {
+			dumptrie(&cur->subs[i],level+1);
+		}
+	}
+	dumptrie(&root,0);
+
 
 	void dump_memcmp(char* dest, struct trie* cur, int level) {
 		if(cur->nsubs == 0) {
