@@ -73,16 +73,16 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			OUTLIT("]");
 		}
 	}
-	void argTag(string realname, string arg) {
+	void argTag(const char* realname, size_t rlen, const char* arg, size_t alen) {
 		OUTLIT("[");
-		OUTSTR(realname);
+		OUTS(realname,rlen);
 		OUTLIT("=");
-		OUTSTR(arg);
+		OUTS(arg,alen);
 		OUTLIT("]");
 		if(cur->children != NULL) {
 			pkids();
 			OUTLIT("[/");
-			OUTSTR(realname);
+			OUTS(realname,rlen);
 			OUTLIT("]");
 		}
 	}
