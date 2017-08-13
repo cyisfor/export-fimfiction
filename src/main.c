@@ -57,9 +57,6 @@ void output_f(const char* s, int l) {
 #define OUTS output_f
 
 void parse(xmlNode* cur, int listitem, int listlevel) {
-	void pnext() {
-		return parse(cur->next,listitem,listlevel);
-	}
 	void pkids() {
 		return parse(cur->children, listitem, listlevel);
 	}
@@ -92,8 +89,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 #define argTag(a,arg) argTagderp(a,sizeof(a)-1,arg)
 	
 	switch(cur->type) {
-	case XML_ELEMENT_NODE: {
-		size_t len = strlen(cur->name);
+	case XML_ELEMENT_NODE:
 		switch(lookup_wanted(cur->name)) {
 		case W_UL:
 			parse(cur->children,-1,listlevel+1);
@@ -166,23 +162,23 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			break;
 		default:
 			warningf("Skipping tag %s",cur->name);
+			pkids();
 		}
-		return pnext();
-	}
-	};
-	// fall-through
-	case XML_NODE_DOCUMENT:
+		break;
+	case XML_DOCUMENT_NODE:
 		pkids();
-		return pnext();
-	case XML_NODE_COMMENT:
+		break;
+	case XML_COMMENT_NODE:
 		INFO("comment stripped %s",cur->children->content);
-		return pnext();
-	case XML_NODE_TEXT:
+		break;
+	case XML_TEXT_NODE:
 		parse_text(cur->children);
-		return pnext();
-	case XML_NODE_COMMENT:
+		break;
+	case XML_COMMENT_NODE:
 		warn("Comment stripped: %s",cur->children->content);
-		return pnext();
+		break;
+	};
+	return parse(cur->next,listitem,listlevel);
 }
 
 void main(int argc, char** argv) {
