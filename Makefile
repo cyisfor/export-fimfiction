@@ -33,13 +33,10 @@ o:
 COMPILE=$(CC) $(CFLAGS) `pkg-config --cflags $(P)` -c -o $@ $<
 
 o/%.d: src/%.c | o
-	$(COMPILE)
-
-o/%.d: CFLAGS:=$(CFLAGS) -MM
+	$(COMPILE) -MM
 
 o/%.o: src/%.c | o
 	$(COMPILE)
-	exit 23
 
 o/main.d o/main.o: o/wanted_tags.gen.h
 

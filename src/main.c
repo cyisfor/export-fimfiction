@@ -10,9 +10,9 @@
 
 FILE* output = NULL; // = open_memstream(...)
 
-mstring story = {};
-mstring author = {};
-mstring title = {};
+string story = {};
+string author = {};
+string title = {};
 
 pcre* dentpat = NULL; // = regex("&([^;\\s&]+);");
 

@@ -156,7 +156,6 @@ int main(int argc, char *argv[])
 
 	void WRITE(const char* buf, size_t n) {
 		ssize_t res = write(fd,buf,n);
-		perror("umm");
 		assert(res == n);
 	}
 	
