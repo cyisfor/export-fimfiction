@@ -5,10 +5,14 @@ LDLIBS+=$(shell pkg-config --libs $P)
 
 LINK=$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-O=$(patsubst %.c,%.o,$N)
+O=$(patsubst src/%.c,o/%.o,$N)
 
 N=gui word main wanted_tags.gen
 export-fimfiction: $O
+	$(LINK)
+
+N=make-wanted
+o/make-wanted: $O
 	$(LINK)
 
 o:
