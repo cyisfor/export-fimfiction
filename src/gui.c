@@ -37,7 +37,6 @@ struct row {
 struct row* rows = NULL;
 int nrows = 0;
 
-// from D getContents(i) => const char*
 static void on_click(GtkButton* button, gpointer udata) {
   int i = (intptr_t) udata;  
   gtk_clipboard_set_text(clip,getContents(rows[i].id),-1);

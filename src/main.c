@@ -250,7 +250,7 @@ void main(int argc, char** argv) {
 				if(lookup_wanted(cur->name) == W_DIV) {
 					xmlChar* val = findProp(cur,"class");
 					if(val && 0==strncmp(val,LITLEN("author"))) {
-						PARSE(cur);
+						PARSE(cur->children);
 						xmlNode* next = cur->next;
 						xmlUnlinkNode(cur);
 						xmlFreeNode(cur);
