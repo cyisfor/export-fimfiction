@@ -70,8 +70,10 @@ int main(int argc, char *argv[])
 				c = off == len ? 0 : tag[off];
 				cur->subs = malloc(sizeof(*cur->subs));
 				cur->nsubs = 1;
+				int olddepth = cur->depth;
 				cur = &cur->subs[0];
 				cur->c = c;
+				cur->depth = olddepth + 1;
 			}
 			// final one, be sure to null it
 			cur->subs = NULL;
@@ -173,6 +175,8 @@ int main(int argc, char *argv[])
 			write(1,&cur->c,1);
 		else
 			write(1,LITLEN("\\0"));
+		write(1,LITLEN(": "));
+		writei(cur->depth);
 		write(1,"\n",1);
 		int i;
 		for(i=0;i<cur->nsubs;++i) {
