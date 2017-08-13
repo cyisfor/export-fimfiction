@@ -162,6 +162,8 @@ void main(int argc, char** argv) {
 		setenv("censored","1",1);
 	}
 
+	wordcount_setup();
+
 	assert(argc > 1);
 	const char* source = argv[1];
 
