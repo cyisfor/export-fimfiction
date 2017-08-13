@@ -177,20 +177,20 @@ int main(int argc, char *argv[])
 			indent(level);
 			write(1,LITLEN("if("));
 			switch(len) {
-			case 1:
+			case 2:
 				write(1,LITLEN("buf["));
 				writei(level);
 				write(1,LITLEN("] == '"));
 				write(1,&cur->c,1);
 				write(1,LITLEN("')\n"));
 				break;
-			case 2:
+			case 3:
 				write(1,LITLEN("buf["));
 				writei(level);
 				write(1,LITLEN("] == '"));
 				write(1,&cur->c,1);
 				write(1,LITLEN("' && buf["));
-				writei(level);
+				writei(level+1);
 				write(1,LITLEN("] == '"));
 				write(1,&cur->subs[0].c,1);
 				write(1,LITLEN("')\n"));
