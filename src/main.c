@@ -289,9 +289,10 @@ void main(int argc, char** argv) {
     if(title.s != NULL && title.l > 0) {
 			wid = max(title.l,wid); // the width of the title but not less than 20
 			// GTK sucks, by the way, so let's waste more cycles copying data again.
-			char* summ = alloca(wid+1);
-			memcpy(summ,title.s,min(wid,title.l));
-			summ[wid] = 0;
+			size_t swid = min(wid,title.l);
+			char* summ = alloca(swid+1);
+			memcpy(summ,title.s,swid);
+			summ[swid] = 0;
       refreshRow(++i,
                  0,
                  "title",
@@ -299,9 +300,10 @@ void main(int argc, char** argv) {
 								 word_count(title.s,title.l));
     }
     if(story.l > 0) {
-			char* summ = alloca(wid+1);
-			memcpy(summ,story.s,min(wid,story.l));
-			summ[wid] = 0;
+			size_t swid = min(wid,story.l);
+			char* summ = alloca(swid+1);
+			memcpy(summ,story.s,swid);
+			summ[swid] = 0;
       refreshRow(++i,
                  1,
                  "body",
@@ -309,9 +311,10 @@ void main(int argc, char** argv) {
 								 word_count(story.s,story.l));
     }
     if(author.s != NULL && author.l > 0) {
-			char* summ = alloca(wid+1);
-			memcpy(summ,author.s,min(wid,author.l));
-			summ[wid] = 0;
+			size_t swid = min(wid,author.l);
+			char* summ = alloca(swid+1);
+			memcpy(summ,author.s,swid);
+			summ[swid] = 0;
       refreshRow(++i,
                  2,
                  "author",
