@@ -13,6 +13,12 @@
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
+#include <error.h>
+
+// meh
+#define WARN(a...) error(0,0,"warning: " a)
+#define INFO(a...) error(0,0,"info: " a)
+
 
 FILE* output = NULL; // = open_memstream(...)
 
@@ -168,7 +174,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			if(src == NULL) {
 				src = findProp(cur,"src");
 				if(src == NULL) {
-					printf("Skipping sourceless image");
+					WARN("Skipping sourceless image");
 					return;
 				}
 			}
@@ -178,7 +184,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		}
 			break;
 		default:
-			printf("Skipping tag %s",cur->name);
+			WARN("Skipping tag %s",cur->name);
 			pkids();
 		}
 		break;
@@ -186,7 +192,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		pkids();
 		break;
 	case XML_COMMENT_NODE:
-		printf("comment stripped %s",cur->children->content);
+		WARN("comment stripped %s",cur->children->content);
 		break;
 	case XML_TEXT_NODE:
 		OUTS(cur->children->content,strlen(cur->children->content));
@@ -214,7 +220,7 @@ void main(int argc, char** argv) {
 		html_when(storyE);
 		xmlNode* titleE = get_title(storyE);
 		if(titleE) {
-			printf("Found title %s",titleE->children->content);
+			INFO("Found title %s",titleE->children->content);
 			title.s = titleE->children->content;
 			// strdup?
 			title.l = strlen(title.s);
