@@ -8,14 +8,6 @@
 
 #include <assert.h>
 
-struct delegate {
-  void* ctx;
-  void (*funcptr)(void);
-};
-
-extern void invoke(void*,void (*)(void));
-#define INVOKE(dg) invoke(dg->ctx,dg->funcptr);
-
 extern const char* getContents(int);
 
 static GtkLabel* makeLabel() {
@@ -89,8 +81,8 @@ void refreshRow(int i, int id, const char* name, const char* summary, const char
 }
 
 static void doRefresh(GtkButton* btn, void* udata) {
-  struct delegate* reload = (struct delegate*) udata;
-  INVOKE(reload); // causes D to call assureRow/refreshRow for each row.
+  void (*reload)(void) = void (*)(void)udata;
+	reload();
 }
 
 static void
@@ -100,8 +92,8 @@ refreshPathChanged (GFileMonitor     *monitor,
                     GFileMonitorEvent event_type,
                     gpointer          udata) {
   if(event_type == G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT) {
-    struct delegate* reload = (struct delegate*) udata;
-    INVOKE(reload); // causes D to call assureRow/refreshRow for each row.
+		void (*reload)(void) = void (*)(void)udata;
+		reload();
   }
 }
 
@@ -111,12 +103,11 @@ static void setCensored(GtkToggleButton *censored, gpointer udata) {
 	} else {
 		unsetenv("censored");
 	}
-	struct delegate* reload = (struct delegate*) udata;
-	INVOKE(reload);
+	void (*reload)(void) = void (*)(void)udata;
+	reload();
 }
 
-void guiLoop(const char* path, void* ctx, void (*reloadfunc)(void)) {
-  struct delegate reload = { ctx, reloadfunc };
+void guiLoop(const char* path, void (*reload)(void)) {
   gtk_init(NULL,NULL);
   GtkWidget* win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	if(NULL != getenv("title")) {
@@ -129,12 +120,12 @@ void guiLoop(const char* path, void* ctx, void (*reloadfunc)(void)) {
   gtk_grid_insert_row(tbl,0);
   GtkWidget* refreshbtn = gtk_button_new_with_label("Reload");
   gtk_grid_attach(tbl,refreshbtn,0,0,2,1);
-  g_signal_connect(refreshbtn,"clicked",G_CALLBACK(doRefresh),&reload);
+  g_signal_connect(refreshbtn,"clicked",G_CALLBACK(doRefresh),reload);
 	GtkWidget* censored = gtk_check_button_new();
   gtk_grid_attach(tbl,censored,2,0,1,1);
 	gtk_widget_set_tooltip_markup(censored, "censored?");
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(censored), NULL != getenv("censored"));
-  g_signal_connect(censored,"toggled",G_CALLBACK(setCensored),&reload);
+  g_signal_connect(censored,"toggled",G_CALLBACK(setCensored),reload);
 	
   printf("Path %s\n",path);
   GFile* f = g_file_new_for_path(path);
@@ -143,9 +134,9 @@ void guiLoop(const char* path, void* ctx, void (*reloadfunc)(void)) {
     (f,
      G_FILE_MONITOR_NONE,NULL,&err);
   assert(err==NULL);
-  g_signal_connect(mon,"changed",G_CALLBACK(refreshPathChanged),&reload);
+  g_signal_connect(mon,"changed",G_CALLBACK(refreshPathChanged),reload);
   gtk_widget_show_all(win);
-  invoke(reload.ctx,reload.funcptr); // causes D to call 
+	reload();
   gtk_main();
   exit(0);
 }

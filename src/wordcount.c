@@ -1,3 +1,4 @@
+#include "wordcount.h"
 #include <pcre.h>
 
 #define connectors "’'_–-"
@@ -20,7 +21,7 @@ void wordcount_setup(void) {
 	assert(study);
 }
 
-int word_count(const char* c, size_t l) {  
+int word_count(const char* c, int l) {  
   int count = 0;
 	for(;;) {
 		int ovec[3];
