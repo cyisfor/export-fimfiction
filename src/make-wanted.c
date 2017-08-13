@@ -196,7 +196,7 @@ int main(int argc, char *argv[])
 				write(1,LITLEN("')\n"));
 				break;
 			default:
-				write(1,"0==strncmp(&buf[");
+				write(1,LITLEN("0==strncmp(&buf["));
 				writei(level);
 				write(1,LITLEN("],\""));
 				while(cur && cur->c) {
