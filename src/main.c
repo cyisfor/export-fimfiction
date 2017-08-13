@@ -208,7 +208,8 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			size_t len = strlen(cur->content);
 			size_t noblank = 0;
 			for(;noblank<len;++noblank) {
-				if(!isspace(cur->content[noblank])) break;
+				if(!isspace(cur->content[noblank]))
+					break;
 			}
 			if(noblank != len) {
 				OUTS(cur->content+noblank,len-noblank);
