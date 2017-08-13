@@ -161,7 +161,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		}
 			break;
 		default:
-			warningf("Skipping tag %s",cur->name);
+			printf("Skipping tag %s",cur->name);
 			pkids();
 		}
 		break;
@@ -169,13 +169,10 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		pkids();
 		break;
 	case XML_COMMENT_NODE:
-		INFO("comment stripped %s",cur->children->content);
+		printf("comment stripped %s",cur->children->content);
 		break;
 	case XML_TEXT_NODE:
 		parse_text(cur->children);
-		break;
-	case XML_COMMENT_NODE:
-		warn("Comment stripped: %s",cur->children->content);
 		break;
 	};
 	return parse(cur->next,listitem,listlevel);
