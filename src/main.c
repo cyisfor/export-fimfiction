@@ -199,7 +199,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		pkids();
 		break;
 	case XML_COMMENT_NODE:
-		WARN("comment stripped %s",cur->children->content);
+		WARN("comment stripped %s",cur->content);
 		break;
 	case XML_TEXT_NODE:
 		if(cur->content) {
@@ -256,6 +256,7 @@ void main(int argc, char** argv) {
 					}
 				}
 			case XML_DOCUMENT_NODE:
+			case XML_HTML_DOCUMENT_NODE: // libxml!!!
 				find_notes(cur->children);
 			default:
 				return find_notes(cur->next);
