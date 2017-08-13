@@ -63,7 +63,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 	void pkids() {
 		return parse(cur->children, listitem, listlevel);
 	}
-	void dumbTag(const char* realname, size_t len) {
+	void dumbTagderp(const char* realname, size_t len) {
 		OUTLIT("[");
 		OUTS(realname,len);
 		OUTLIT("]");
@@ -74,7 +74,8 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			OUTLIT("]");
 		}
 	}
-	void argTag(const char* realname, size_t rlen, const char* arg) {
+#define dumbTag(a) dumbTagderp(a,sizeof(a)-1)
+	void argTagderp(const char* realname, size_t rlen, const char* arg) {
 		size_t alen = strlen(arg);
 		OUTLIT("[");
 		OUTS(realname,rlen);
@@ -88,12 +89,19 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			OUTLIT("]");
 		}
 	}
-
+#define argTag(a,arg) ArgTagderp(a,sizeof(a)-1,arg)
+	
 	switch(cur->type) {
 	case XML_ELEMENT_NODE: {
 		size_t len = strlen(cur->name);
-#define IS(a) ((LITSIZ(a) == len) && (0 == memcmp(cur->name,a,LITSIZ(a))))
-		if(IS("li")) {
+		switch(lookup_wanted(cur->name)) {
+		case W_UL:
+			parse(cur->children,-1,listlevel+1);
+			return parse(cur->next,listitem,listlevel);
+		case W_OL:
+			parse(cur->children,0,listlevel+1);
+			return parse(cur->next,listitem,listlevel);
+		case W_LI: {
 			int i;
 			for(i=0;i<listlevel;++i) {
 				OUTLIT("  ");
@@ -105,13 +113,9 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 				OUTLIT("• ");
 			}
 			// still check children for sublists
-		} else if(IS("ul")) {
-			parse(cur->children,false,listlevel+1);
-		} else if(IS("ol")) {
-			parse(cur->children,true,listlevel+1);
-		} 		
-		switch(lookup_wanted(cur->name)) {
-		case W_A: return argTag(LITLEN("url"),findProp(cur,"href"));
+		}
+
+		case W_A: return argTag("url",findProp(cur,"href"));
 		case W_CHAT: return dumbTag("quote");
 		case W_I: return dumbTag("i");
 		case W_B: return dumbTag("b");
@@ -119,7 +123,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		case W_S: return dumbTag("s");
 		case W_HR: return dumbTag("hr");
 		case W_BLOCKQUOTE: return dumbTag("quote");
-		case W_FONT: return argTag("color",findProp(cur,"color"));
+		case W_FONT: return parse(cur->
 		case W_SMALL: return argTag("size","0.75em");
 		case W_UL: return dolist!false();
 		case W_OL: return dolist!true();
