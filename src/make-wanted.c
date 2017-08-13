@@ -201,26 +201,24 @@ int main(int argc, char *argv[])
 		}
 		indent(level);
 		WRITE(LITLEN("if("));
+		struct trie* place = cur;
+		void oneshortcut(const char* prefix, size_t plen) {
+			if(plen) WRITE(prefix,plen);
+			WRITE(LITLEN("buf["));
+			writei(level);
+			WRITE(LITLEN("] == '"));
+			WRITE(&place->c,1);
+			*dest++ = toupper(place->c);
+			WRITE(LITLEN("')\n"));
+			place = &place->subs[0];
+		}
 		switch(len) {
 		case 2:
-			WRITE(LITLEN("buf["));
-			writei(level);
-			WRITE(LITLEN("] == '"));
-			WRITE(&cur->c,1);
-			*dest++ = toupper(cur->c);
-			WRITE(LITLEN("')\n"));
+			oneshortcut(NULL,0);
 			break;
 		case 3:
-			WRITE(LITLEN("buf["));
-			writei(level);
-			WRITE(LITLEN("] == '"));
-			WRITE(&cur->c,1);
-			*dest++ = toupper(cur->c);
-			WRITE(LITLEN("' && buf["));
-			writei(level+1);
-			WRITE(LITLEN("] == '"));
-			WRITE(&cur->subs[0].c,1);
-			*dest++ = toupper(cur->subs[0].c);
+			oneshortcut(NULL,0);
+			oneshortcut(LITLEN("' && "));
 			WRITE(LITLEN("')\n"));
 			break;
 		default:
