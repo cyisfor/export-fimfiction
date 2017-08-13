@@ -18,7 +18,7 @@ void wordcount_setup(void) {
 										 &err,&erroffset,
 										 NULL);
 	assert(pat);
-	study = pcre_study(pat, PCRE_JIT_COMPILE,&err);
+	study = pcre_study(pat, PCRE_STUDY_JIT_COMPILE,&err);
 	assert(study);
 }
 
@@ -26,7 +26,11 @@ int word_count(const char* c, int l) {
   int count = 0;
 	for(;;) {
 		int ovec[3];
-		int res = pcre_exec(pat,study,c,l,0,ovec,3);
+		int rc = pcre_exec(pat,
+											 study,
+											 c,l,0,
+											 0,
+											 ovec,3);
 		if(rc < 0) {
 			if(rc == PCRE_ERROR_NOMATCH) break;
 			abort();
