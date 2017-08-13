@@ -12,6 +12,7 @@
 #include <error.h>
 #include <string.h>
 #include <stdbool.h>
+#include <assert.h>
 
 FILE* output = NULL; // = open_memstream(...)
 
@@ -172,7 +173,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		printf("comment stripped %s",cur->children->content);
 		break;
 	case XML_TEXT_NODE:
-		parse_text(cur->children);
+		OUTS(cur->children->content,strlen(cur->children->content));
 		break;
 	};
 	return parse(cur->next,listitem,listlevel);
