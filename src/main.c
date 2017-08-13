@@ -194,13 +194,16 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		}
 		break;
 	case XML_DOCUMENT_NODE:
+	case XML_HTML_DOCUMENT_NODE: // libxml!!!
 		pkids();
 		break;
 	case XML_COMMENT_NODE:
 		WARN("comment stripped %s",cur->children->content);
 		break;
 	case XML_TEXT_NODE:
-		OUTS(cur->children->content,strlen(cur->children->content));
+		if(cur->children) {
+			OUTS(cur->children->content,strlen(cur->children->content));
+		}
 		break;
 	};
 	return parse(cur->next,listitem,listlevel);
@@ -235,6 +238,7 @@ void main(int argc, char** argv) {
 		free(author.s);
 		author.s = NULL;
 		author.l = 0;
+		fclose(output);
 		output = open_memstream(&author.s,&author.l);
 		void find_notes(xmlNode* cur) {
 			if(!cur) return;
@@ -257,7 +261,7 @@ void main(int argc, char** argv) {
 			};
 		}
 		find_notes(storyE);
-
+		fclose(output);
 		output = open_memstream(&story.s,&story.l);		
 		PARSE(storyE);
 		
