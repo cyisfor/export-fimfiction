@@ -3,6 +3,8 @@
 #include "string.h"
 #include "html_when.h"
 
+#include "wanted_tags.h"
+
 #include <libxml/parser.h>
 #include <pcre.h>
 
@@ -97,7 +99,47 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			parse(cur->children,false,listlevel+1);
 		} else if(IS("ol")) {
 			parse(cur->children,true,listlevel+1);
-		} 
+		} 		
+		switch(lookup_wanted(e.tag)) {
+		case W_A: return argTag("url",findProp(cur,"href"));
+		case W_CHAT: return dumbTag("quote");
+		case W_I: return dumbTag("i");
+		case W_B: return dumbTag("b");
+		case W_U: return dumbTag("u");
+		case W_S: return dumbTag("s");
+		case W_HR: return dumbTag("hr");
+		case W_BLOCKQUOTE: return dumbTag("quote");
+		case W_FONT: return argTag("color",findProp(cur,"color"));
+		case W_SMALL: return argTag("size","0.75em");
+		case W_UL: return dolist!false();
+		case W_OL: return dolist!true();
+		case W_H3: return argTag("size","2em");
+		case DIV: {
+			if(0==strncmp(findProp(cur,"class"),LITLEN("spoiler"))) :
+				return dumbTag("spoiler");
+			return;
+		case W_ROOT:
+		case W_P:
+		case W_TITLE:
+			// strip
+			pkids();
+			return pnext();
+		case W_IMG:
+			const char* src = findProp(cur,"data-fimfiction-src");
+			if(src == NULL) {
+				src = findProp(cur,"src");
+				if(src == NULL) {
+					WARN("Skipping sourceless image");
+					return;
+				}
+			}
+			OUTLIT("[img]");
+			OUTS(src, strlen(src));
+			OUTLIT("[/img]");
+			return;
+		default:
+			warningf("Skipping tag %s",e.tag);
+		}
 	}
 		// fall-through
 	case XML_NODE_DOCUMENT:
@@ -109,57 +151,11 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 	case XML_NODE_TEXT:
 		parse_text(cur->children);
 		return pnext();
-	};
-	if(e.isTextNode()) {
-		output(deEntitize(e.text));
-		return;
-	} else if(e.isCommentNode()) {
-		tracef("Comment stripped: %s",e.firstChild.text);
+	case XML_NODE_COMMENT:
+		warn("Comment stripped: %s",cur->children->content);
 		return;
 	}
-	switch(e.tag) {
-	case "a": return argTag("url",e.attr("href"));
-  case "chat": return dumbTag("quote");
-	case "i": return dumbTag("i");
-	case "b": return dumbTag("b");
-	case "u": return dumbTag("u");
-	case "s": return dumbTag("s");
-	case "hr": return dumbTag("hr");
-	case "blockquote": return dumbTag("quote");
-	case "font": return argTag("color",e.attr("color"));
-	case "small": return argTag("size","0.75em");
-	case "ul": return dolist!false();
-	case "ol": return dolist!true();
-	case "h3": return argTag("size","2em");
-	case "div":
-		switch(e.attr("class")) {
-		case "spoiler":
-			return dumbTag("spoiler");
-		default:
-			break;
-		}
-		goto case;
-	case "root":
-	case "p":
-	case "title":
-		// strip
-		return pkids();
-	case "img":
-		auto src = e.attr("data-fimfiction-src");
-		if(src is null) {
-			src = e.attr("src");
-			if(src is null) {
-				warningf("Skipping sourceless image");
-				return;
-			}
-		}
-		output("[img]" ~ src ~ "[/img]");
-		return;
-	default:
-		warningf("Skipping tag %s",e.tag);
-		return;
-	}
-} 
+	} 
 
 alias word = wordcount;
 
