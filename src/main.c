@@ -7,6 +7,7 @@
 
 #include <libxml/parser.h>
 #include <pcre.h>
+#include <error.h>
 
 FILE* output = NULL; // = open_memstream(...)
 
@@ -39,7 +40,7 @@ const string getContents(int i) {
 		return *((const string*)&author);
     break;
   default:
-    ERROR("Bad index %s",i);
+    error(23,0,"Bad index %s",i);
   }
 }
 
@@ -48,7 +49,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		return parse(cur->next,listitem,listlevel);
 	}
 	void pkids() {
-		return parse(cur->children, listordered, listlevel);
+		return parse(cur->children, listitem, listlevel);
 	}
 	void dumbTag(string realname) {
 		OUTLIT("[");
