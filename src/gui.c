@@ -76,6 +76,7 @@ void refreshRow(int i, int id, const char* name, const char* summary, int slen, 
   cur->id = id;
   
   gtk_button_set_label(cur->btn, name);
+	gtk_label_set_max_width_chars(cur->label, slen);
   gtk_label_set_text(cur->label, summary);
 	char buf[0x100];
 	snprintf(buf,0x100,"%d",count);

@@ -287,12 +287,15 @@ void main(int argc, char** argv) {
 		int i = 0;
 		size_t wid = 20;
     if(title.s != NULL && title.l > 0) {
-			wid = max(title.l,wid);
+			wid = max(title.l,wid); // the width of the title but not less than 20
+			// GTK sucks, by the way, so let's waste more cycles copying data again.
+			char* summ = alloca(wid+1);
+			memcpy(summ,story.s,min(wid,story.l));
+			summ[wid] = 0;
       refreshRow(++i,
                  0,
                  "title",
 								 title.s,
-								 title.l,
 								 word_count(title.s,title.l));
     }
     if(story.l > 0) {
@@ -303,7 +306,6 @@ void main(int argc, char** argv) {
                  1,
                  "body",
                  summ,
-								 min(wid,story.l),
 								 word_count(story.s,story.l));
     }
     if(author.s != NULL && author.l > 0) {
@@ -314,7 +316,6 @@ void main(int argc, char** argv) {
                  2,
                  "author",
                  summ,
-								 min(wid,author.l),
                  word_count(author.s,author.l));
     }
   }
