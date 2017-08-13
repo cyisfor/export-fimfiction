@@ -31,6 +31,7 @@ mstring title = {};
 pcre* dentpat = NULL; // = regex("&([^;\\s&]+);");
 
 static xmlNode* get_title(xmlNode* top) {
+	if(!top) return NULL;
 	switch(top->type) {
 	case XML_ELEMENT_NODE:
 		if(lookup_wanted(top->name) == W_TITLE) {
@@ -82,6 +83,8 @@ void output_f(const char* s, int l) {
 #define OUTS output_f
 
 void parse(xmlNode* cur, int listitem, int listlevel) {
+	if(!cur) return;
+	
 	void pkids() {
 		return parse(cur->children, listitem, listlevel);
 	}
@@ -234,6 +237,7 @@ void main(int argc, char** argv) {
 		author.l = 0;
 		output = open_memstream(&author.s,&author.l);
 		void find_notes(xmlNode* cur) {
+			if(!cur) return;
 			switch(cur->type) {
 			case XML_ELEMENT_NODE:
 				if(lookup_wanted(cur->name) == W_DIV) {

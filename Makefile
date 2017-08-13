@@ -1,4 +1,4 @@
-CFLAGS+=-ggdb
+CFLAGS+=-ggdb -foptimize-sibling-calls
 CFLAGS+=-Io -Ihtml_when/source -Ihtml_when/libxml2/include
 P=gtk+-3.0 glib-2.0 gio-2.0
 
