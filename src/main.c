@@ -139,8 +139,8 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			break;
 		case W_H3: argTag("size","2em");
 			break;
-		case DIV: {
-			if(0==strncmp(findProp(cur,"class"),LITLEN("spoiler"))) :
+		case W_DIV: {
+			if(0==strncmp(findProp(cur,"class"),LITLEN("spoiler")))
 				return dumbTag("spoiler");
 		}
 			break;
@@ -150,18 +150,19 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			// strip
 			pkids();
 			break;
-		case W_IMG:
+		case W_IMG: {
 			const char* src = findProp(cur,"data-fimfiction-src");
 			if(src == NULL) {
 				src = findProp(cur,"src");
 				if(src == NULL) {
-					WARN("Skipping sourceless image");
+					printf("Skipping sourceless image");
 					return;
 				}
 			}
 			OUTLIT("[img]");
 			OUTS(src, strlen(src));
 			OUTLIT("[/img]");
+		}
 			break;
 		default:
 			warningf("Skipping tag %s",cur->name);
