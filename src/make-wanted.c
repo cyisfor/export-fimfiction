@@ -271,13 +271,14 @@ int main(int argc, char *argv[])
 		for(;i<cur->nsubs;++i) {
 			char c = cur->subs[i].c;
 			if(c) {
-				*dest = c;
-				return dump_enum(dest+1,&cur->subs[i]);
+				*dest = toupper(c);
+				dump_enum(dest+1,&cur->subs[i]);
 			} else {
 				if(first) {
 					first = false;
+					write(1,LITLEN("\t"));
 				} else {
-					write(1,LITLEN(", "));
+					write(1,LITLEN(",\n\t"));
 				}
 				write(1,tag,dest-tag);
 			}
