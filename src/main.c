@@ -8,6 +8,7 @@
 #include <libxml/parser.h>
 #include <pcre.h>
 #include <error.h>
+#include <string.h>
 
 FILE* output = NULL; // = open_memstream(...)
 
@@ -44,6 +45,12 @@ const string getContents(int i) {
   }
 }
 
+void output_f(const char* s, int l) {
+	fwrite(s,l,1,output);
+}
+#define OUTLIT(a) output_f(a,sizeof(a)-1)
+#define OUTSTR(a) output_f(a.s,a.l);
+
 void parse(xmlNode* cur, int listitem, int listlevel) {
 	void pnext() {
 		return parse(cur->next,listitem,listlevel);
@@ -77,7 +84,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 	}
 
 	switch(cur->type) {
-	case XML_NODE_ELEMENT: {
+	case XML_ELEMENT_NODE: {
 		size_t len = strlen(cur->name);
 #define IS(a) ((LITSIZ(a) == len) && (0 == memcmp(cur->name,a,LITSIZ(a))))
 		if(IS("li")) {
