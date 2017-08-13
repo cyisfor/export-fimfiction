@@ -267,11 +267,11 @@ int main(int argc, char *argv[])
 
 	bool first = true;
 	void dump_enum(char* dest, struct trie* cur) {
-		if(cur->nsubs == 0) {
+		if(!cur) return;
 			if(first) {
 				first = false;
 			} else {
-				write(1,", ");
+				write(1,LITLEN(", "));
 			}
 			write(1,tag,dest-tag);
 		}
@@ -281,7 +281,7 @@ int main(int argc, char *argv[])
 	
 	
 	write(1,LITLEN("enum wanted_tags {\n"));
-	dump_enum(tag, &root, 0);
+	dump_enum(tag, &root);
 	write(1,LITLEN("};\n"));
 
 	write(1,LITLEN("enum wanted_tags lookup_wanted(const char* tag) {\n"));
