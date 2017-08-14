@@ -168,7 +168,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		case W_H3: argTag("size","2em");
 			break;
 		case W_DIV: {
-			if(0==strncmp(findProp(cur,"class"),"spoiler"))
+			if(0==ISLIT(findProp(cur,"class"),"spoiler"))
 				return dumbTag("spoiler");
 		}
 			break;
@@ -266,7 +266,7 @@ void main(int argc, char** argv) {
 			case XML_ELEMENT_NODE:
 				if(lookup_wanted(cur->name) == W_DIV) {
 					xmlChar* val = findProp(cur,"class");
-					if(val && 0==strncmp(val,"author")) {
+					if(val && 0==ISLIT(val,"author")) {
 						PARSE(cur->children);
 						xmlNode* next = cur->next;
 						xmlUnlinkNode(cur);

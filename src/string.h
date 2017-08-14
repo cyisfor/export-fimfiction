@@ -23,4 +23,6 @@ typedef struct string {
 
 #define CSTR(a) *((struct string*)&a)
 
+#define ISLIT(s,a) ((strlen(s) == LITSIZ(a)) ? (0 == memcmp(s,a,LITSIZ(a))) : 0)
+
 #endif /* _STRING_H_ */
