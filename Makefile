@@ -1,12 +1,12 @@
 CFLAGS+=-ggdb -foptimize-sibling-calls
-CFLAGS+=-Io -Ihtml_when/source -Ihtml_when/libxml2/include
+CFLAGS+=-Io -Ihtml_when/source -Ilibxml2/include
 P=gtk+-3.0 glib-2.0 gio-2.0
 
 LDLIBS+=$(shell pkg-config --libs $P) -lpcre
 LDLIBS+=$(shell xml2-config --libs | sed -e's/-xml2//g')
 LINK=$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-O=$(patsubst %,o/%.o,$N) html_when/libxml2/.libs/libxml2.a html_when/libhtmlwhen.a
+O=$(patsubst %,o/%.o,$N) libxml2/.libs/libxml2.a html_when/libhtmlwhen.a
 
 N=gui wordcount main wanted_tags.gen
 export-fimfiction: $O
@@ -19,13 +19,12 @@ html_when/libhtmlwhen.a:
 	$(MAKE) -C html_when
 .PHONY: html_when/libhtmlwhen.a
 
-o/main.o: html_when/libxml2/include/libxml/xmlversion.h 
+o/main.o: libxml2/include/libxml/xmlversion.h 
 
-html_when/libxml2/include/libxml/xmlversion.h html_when/libxml2/.libs/libxml2.a: html_when/libxml2/configure
-	cd html_when/libxml2/ && make
+libxml2/include/libxml/xmlversion.h libxml2/.libs/libxml2.a: libxml2/configure
 
-html_when/libxml2/configure:
-	cd html_when/libxml2/ && sh autogen.sh
+libxml2/configure:
+	$(MAKE) -C html_when
 
 N=make-wanted
 o/make-wanted: o/make-wanted.o
