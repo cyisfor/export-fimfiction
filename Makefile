@@ -9,6 +9,7 @@ LINK=$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 O=$(patsubst %,o/%.o,$N) libxml2/.libs/libxml2.a html_when/libhtmlwhen.a
 
 derp: setup
+	$(MAKE) -C html_when
 	$(MAKE) export-fimfiction
 
 N=gui wordcount main wanted_tags.gen
@@ -16,11 +17,6 @@ export-fimfiction: $O
 	$(LINK)
 
 -include $(patsubst %,o/%.d,$N)
-
-
-html_when/libhtmlwhen.a:
-	$(MAKE) -C html_when
-.PHONY: html_when/libhtmlwhen.a
 
 o/main.o: libxml2/include/libxml/xmlversion.h 
 
