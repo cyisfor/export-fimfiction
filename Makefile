@@ -52,4 +52,8 @@ o/wanted_tags.gen.c o/wanted_tags.gen.h: o/make-wanted src/tags.wanted | o
 clean:
 	rm -rf o
 
-.PHONY: all stuff
+.PHONY: all stuff setup
+
+setup:
+	sh setup.sh
+	$(MAKE) -C html_when
