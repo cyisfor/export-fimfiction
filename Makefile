@@ -1,5 +1,5 @@
 CFLAGS+=-ggdb -foptimize-sibling-calls
-CFLAGS+=-Io -Ihtml_when/source -Ilibxml2/include
+CFLAGS+=-Io -Ihtml_when/src -Ilibxml2/include
 P=gtk+-3.0 glib-2.0 gio-2.0
 
 LDLIBS+=$(shell pkg-config --libs $P) -lpcre
