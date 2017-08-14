@@ -8,6 +8,9 @@ LINK=$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 O=$(patsubst %,o/%.o,$N) libxml2/.libs/libxml2.a html_when/libhtmlwhen.a
 
+derp: setup
+	$(MAKE) export-fimfiction
+
 N=gui wordcount main wanted_tags.gen
 export-fimfiction: $O
 	$(LINK)
@@ -51,7 +54,7 @@ o/wanted_tags.gen.c o/wanted_tags.gen.h: o/make-wanted src/tags.wanted | o
 clean:
 	rm -rf o
 
-.PHONY: all stuff setup
+.PHONY: all stuff setup derp
 
 setup:
 	sh setup.sh
