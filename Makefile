@@ -55,4 +55,4 @@ clean:
 
 setup:
 	sh setup.sh
-	$(MAKE) -C html_when
+	$(MAKE) -C html_when setup

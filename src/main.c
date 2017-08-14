@@ -174,8 +174,11 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			break;
 		case W_ROOT:
 		case W_P:
+		case W_HTML:
+		case W_HEAD:
+		case W_BODY:
 		case W_TITLE:
-			// strip
+			// strip silently
 			pkids();
 			break;
 		case W_IMG: {
