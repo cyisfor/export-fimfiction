@@ -1,0 +1,3 @@
+[submodule "git-tools"]
+	path = git-tools
+	url = http://github.com/cyisfor/git-tools
