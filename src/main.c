@@ -167,7 +167,9 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			break;
 		case W_H3: argTag("size","2em");
 			break;
-		case W_DIV: {
+		case W_DIV:
+		case W_SPAN:
+		{
 			if(0==ISLIT(findProp(cur,"class"),"spoiler"))
 				return dumbTag("spoiler");
 		}
