@@ -6,7 +6,8 @@ LDLIBS+=$(shell pkg-config --libs $P) -lpcre
 LDLIBS+=$(shell xml2-config --libs | sed -e's/-xml2//g')
 LINK=$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
-O=$(patsubst %,o/%.o,$N) libxml2/.libs/libxml2.a html_when/libhtmlwhen.a
+O=$(patsubst %,o/%.o,$N) libxml2/.libs/libxml2.a html_when/libhtmlwhen.a \
+$(foreach name,$(N),$(eval targets:=$$(targets) $(name)))
 
 derp: setup
 	$(MAKE) -C html_when
@@ -55,3 +56,5 @@ clean:
 setup:
 	sh setup.sh
 	$(MAKE) -C html_when setup
+
+-include $(patsubst %, o/%.d,$(targets))
