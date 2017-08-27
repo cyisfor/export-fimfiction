@@ -2,6 +2,7 @@
 #define _STRING_H_
 
 #include <stdlib.h> // size_t
+#include <string.h> // memcmp
 
 typedef struct mstring {
 	char* s;

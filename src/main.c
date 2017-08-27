@@ -2,7 +2,7 @@
 
 #include "wordcount.h"
 #include "gui.h"
-#include "string.h"
+#include "mystring.h"
 #include "html_when.h"
 
 #include "wanted_tags.gen.h"
@@ -15,6 +15,7 @@
 #include <assert.h>
 #include <error.h>
 #include <ctype.h> // isspace
+#include <string.h>
 
 // meh
 #define WARN(a...) error(0,0,"warning: " a)
