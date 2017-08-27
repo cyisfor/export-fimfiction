@@ -16,7 +16,7 @@ derp: setup
 	$(MAKE) -C html_when
 	$(MAKE) export-fimfiction
 
-N=gui wordcount main wanted_tags.gen
+N=gui wordcount main
 export-fimfiction: $O
 	$(LINK)
 
