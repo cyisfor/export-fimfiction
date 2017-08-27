@@ -15,7 +15,6 @@
 #include <assert.h>
 #include <error.h>
 #include <ctype.h> // isspace
-#include <string.h>
 
 // meh
 #define WARN(a...) error(0,0,"warning: " a)
