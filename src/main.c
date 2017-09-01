@@ -77,7 +77,20 @@ const string getContents(int i) {
   }
 }
 
+enum { NONE, NEEDASPACE, NEEDNL } needs = NONE;
+
 void output_f(const char* s, int l) {
+	switch(needs) {
+	case NEEDASPACE:
+		fputc(' ',output);
+		needs = NONE;
+		break;
+	case NEEDNL:
+		fputc('\n',output);
+		needs = NONE;
+		break;
+	};
+
 	int res = fwrite(s,l,1,output);
 	assert(res == 1);
 }
@@ -101,6 +114,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			OUTLIT("[/");
 			OUTS(realname,len);
 			OUTLIT("]");
+			needs = NEEDASPACE;
 		}
 	}
 #define dumbTag(a) dumbTagderp(a,sizeof(a)-1)
@@ -116,6 +130,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			OUTLIT("[/");
 			OUTS(realname,rlen);
 			OUTLIT("]");
+			needs = NEEDASPACE;
 		}
 	}
 #define argTag(a,arg) argTagderp(a,sizeof(a)-1,arg)
@@ -125,11 +140,11 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		switch(lookup_wanted(cur->name)) {
 		case W_UL:
 			parse(cur->children,-1,listlevel+1);
-			OUTLIT("\n");
+			needs = NEEDNL;
 			break;
 		case W_OL:
 			parse(cur->children,0,listlevel+1);
-			OUTLIT("\n");
+			needs = NEEDNL;
 			break;
 		case W_LI: {
 			int i;
@@ -144,7 +159,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			}
 			// still check children for sublists
 			pkids();
-			OUTLIT("\n");
+			needs = NEEDNL;
 			break;
 		}
 
