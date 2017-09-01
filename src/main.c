@@ -229,15 +229,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		break;
 	case XML_TEXT_NODE:
 		if(cur->content) {
-			size_t len = strlen(cur->content);
-			size_t noblank = 0;
-			for(;noblank<len;++noblank) {
-				if(!isspace(cur->content[noblank]))
-					break;
-			}
-			if(noblank != len) {
-				OUTS(cur->content+noblank,len-noblank);
-			}
+			OUTS(cur->content,strlen(cur->content));
 		}
 		break;
 	};
