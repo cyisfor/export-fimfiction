@@ -241,13 +241,13 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 				if(noblank != len) {
 					OUTS(cur->content+noblank,len-noblank);
 				}
+				remove_blank = false;
 			} else {
 				OUTS(cur->content,strlen(cur->content));
 			}
 		}
 		break;
 	};
-	remove_blank = false;
 	return parse(cur->next,listitem,listlevel);
 }
 
@@ -312,6 +312,7 @@ void main(int argc, char** argv) {
 		find_notes(storyE);
 		fclose(output);
 		output = open_memstream(&story.s,&story.l);
+		remove_blank = true;
 		PARSE(storyE);
 		fclose(output);
 		output = NULL;
