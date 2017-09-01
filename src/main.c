@@ -99,6 +99,8 @@ void output_f(const char* s, int l) {
 #define OUTF(a...) fprintf(output,a)						
 #define OUTS output_f
 
+bool remove_blank = true;
+
 void parse(xmlNode* cur, int listitem, int listlevel) {
 	if(!cur) return;
 	
@@ -229,10 +231,23 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		break;
 	case XML_TEXT_NODE:
 		if(cur->content) {
-			OUTS(cur->content,strlen(cur->content));
+			size_t len = strlen(cur->content);
+			if(remove_blank) {
+				size_t noblank = 0;
+				for(;noblank<len;++noblank) {
+					if(!isspace(cur->content[noblank]))
+						break;
+				}
+				if(noblank != len) {
+					OUTS(cur->content+noblank,len-noblank);
+				}
+			} else {
+				OUTS(cur->content,strlen(cur->content));
+			}
 		}
 		break;
 	};
+	remove_blank = false;
 	return parse(cur->next,listitem,listlevel);
 }
 
