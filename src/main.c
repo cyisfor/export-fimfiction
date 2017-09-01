@@ -125,13 +125,15 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		switch(lookup_wanted(cur->name)) {
 		case W_UL:
 			parse(cur->children,-1,listlevel+1);
+			OUTLIT("\n");
 			break;
 		case W_OL:
 			parse(cur->children,0,listlevel+1);
+			OUTLIT("\n");
 			break;
 		case W_LI: {
 			int i;
-			for(i=0;i<listlevel;++i) {
+			for(i=1;i<listlevel;++i) {
 				OUTLIT("  ");
 			}
 			if(listitem >= 0) {
@@ -142,6 +144,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			}
 			// still check children for sublists
 			pkids();
+			OUTLIT("\n");
 			break;
 		}
 
