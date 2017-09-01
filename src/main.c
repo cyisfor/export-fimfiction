@@ -271,7 +271,8 @@ void main(int argc, char** argv) {
 			case XML_ELEMENT_NODE:
 				if(lookup_wanted(cur->name) == W_DIV) {
 					xmlChar* val = findProp(cur,"class");
-					if(val && 0==ISLIT(val,"author")) {
+					INFO("vclass %s",val);
+					if(val && ISLIT(val,"author")) {
 						PARSE(cur->children);
 						xmlNode* next = cur->next;
 						xmlUnlinkNode(cur);
