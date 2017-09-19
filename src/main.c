@@ -8,6 +8,8 @@
 #include "wanted_tags.gen.h"
 
 #include <libxml/parser.h>
+#include <sys/mman.h> // mmap
+
 #include <pcre.h>
 #include <error.h>
 #include <string.h>
@@ -15,6 +17,7 @@
 #include <assert.h>
 #include <error.h>
 #include <ctype.h> // isspace
+#include <unistd.h> // isatty
 
 // meh
 #define WARN(a...) error(0,0,"warning: " a)
@@ -253,16 +256,78 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 
 #define PARSE(a) parse(a,-1,0)
 
+xmlDoc* getdoc_stdin(void) {
+
+	lseek(STDIN_FILENO,0,SEEK_SET);
+		
+
 void main(int argc, char** argv) {
 	// fimfiction is dangerous, so default to censored
 	if(NULL==getenv("uncensored")) {
 		setenv("censored","1",1);
 	}
 
+	
+
 	wordcount_setup();
 
-	assert(argc > 1);
-	const char* source = argv[1];
+	xmlDoc* (*getdoc)(void);
+	if(argc > 1) {
+		const char* source = argv[1];
+		xmlDoc* getdoc_arg(void) {
+			return htmlReadFile(source, "UTF-8",
+													HTML_PARSE_RECOVER |
+													HTML_PARSE_NOERROR |
+													HTML_PARSE_NOBLANKS |
+													HTML_PARSE_COMPACT);
+		}
+		getdoc = getdoc_arg;
+	} else {
+		const char* mem;
+		off_t size;
+
+		xmlDoc* getdoc_mem(void) {
+			return htmlReadMemory(mem,size,"stdin://","UTF-8",
+														HTML_PARSE_RECOVER |
+														HTML_PARSE_NOERROR |
+														HTML_PARSE_NOBLANKS |
+														HTML_PARSE_COMPACT);
+		}
+		getdoc = getdoc_mem;
+		void setit(void) {
+			struct stat info;
+			if(0==fstat(STDIN_FILENO,&info)) {
+				mem = mmap(NULL,info.st_size,PROT_READ,MAP_PRIVATE,STDIN_FILENO,0);
+				if(mem != MAP_FAILED) {
+					size = info.st_size;
+					return;
+				}
+				// it's a pipe, I guess?
+			}
+			if(isatty(STDIN_FILENO)) {
+				ERROR("You probably should supply an argument if you aren't redirecting a file or piping a command to stdin.");
+			}
+			mem = malloc(0x1000);
+			off_t off = 0;
+			for(;;) {
+				if(size-off < 0x100) {
+					size += 0x1000;
+					mem = realloc(mem,size);
+				}
+				ssize_t amt = read(STDIN_FILENO,mem+off,size-off);
+				if(amt == 0) {
+					return;
+				}
+				ensure(amt > 0);
+				off += amt;
+			}
+		}
+		setit();
+	} else {
+		getdoc = getdoc_stdin;
+	}
+			
+
 
   void recalculate() {
 		xmlDoc* doc = htmlReadFile(source, "UTF-8",
