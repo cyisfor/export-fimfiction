@@ -280,7 +280,7 @@ void main(int argc, char** argv) {
 		}
 		getdoc = getdoc_arg;
 	} else {
-		const char* mem;
+		char* mem;
 		off_t size;
 
 		xmlDoc* getdoc_mem(void) {
@@ -302,7 +302,8 @@ void main(int argc, char** argv) {
 				// it's a pipe, I guess?
 			}
 			if(isatty(STDIN_FILENO)) {
-				ERROR("You probably should supply an argument if you aren't redirecting a file or piping a command to stdin.");
+				WARN("You probably should supply an argument if you aren't redirecting a file or piping a command to stdin.");
+				exit(23);
 			}
 			mem = malloc(0x1000);
 			off_t off = 0;
