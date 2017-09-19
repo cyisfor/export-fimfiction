@@ -264,15 +264,15 @@ void main(int argc, char** argv) {
 		setenv("censored","1",1);
 	}
 
-	
+	const char* path = NULL;
 
 	wordcount_setup();
 
 	xmlDoc* (*getdoc)(void);
 	if(argc > 1) {
-		const char* source = argv[1];
+		path = argv[1];
 		xmlDoc* getdoc_arg(void) {
-			return htmlReadFile(source, "UTF-8",
+			return htmlReadFile(path, "UTF-8",
 													HTML_PARSE_RECOVER |
 													HTML_PARSE_NOERROR |
 													HTML_PARSE_NOBLANKS |
@@ -415,5 +415,5 @@ void main(int argc, char** argv) {
     }
   }
 
-  guiLoop(source,recalculate);
+  guiLoop(path,recalculate);
 }
