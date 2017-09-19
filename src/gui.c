@@ -128,15 +128,19 @@ void guiLoop(const char* path, void (*reload)(void)) {
 	gtk_widget_set_tooltip_markup(censored, "censored?");
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(censored), NULL != getenv("censored"));
   g_signal_connect(censored,"toggled",G_CALLBACK(setCensored),reload);
-	
-  printf("Path %s\n",path);
-  GFile* f = g_file_new_for_path(path);
-  GError* err = NULL;
-  GFileMonitor* mon = g_file_monitor_file
-    (f,
-     G_FILE_MONITOR_NONE,NULL,&err);
-  assert(err==NULL);
-  g_signal_connect(mon,"changed",G_CALLBACK(refreshPathChanged),reload);
+
+	if(path) {
+		printf("Monitoring Path %s\n",path);
+		GFile* f = g_file_new_for_path(path);
+		GError* err = NULL;
+		GFileMonitor* mon = g_file_monitor_file
+			(f,
+			 G_FILE_MONITOR_NONE,NULL,&err);
+		assert(err==NULL);
+		g_signal_connect(mon,"changed",G_CALLBACK(refreshPathChanged),reload);
+	} else {
+		puts("WARNING: no path to monitor!");
+	}
   gtk_widget_show_all(win);
 	reload();
   gtk_main();

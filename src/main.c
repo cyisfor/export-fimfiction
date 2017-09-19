@@ -316,7 +316,10 @@ void main(int argc, char** argv) {
 				if(amt == 0) {
 					return;
 				}
-				ensure(amt > 0);
+				if(amt < 0) {
+					perror("read failed?");
+					abort();
+				}
 				off += amt;
 			}
 		}
