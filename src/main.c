@@ -284,7 +284,8 @@ void main(int argc, char** argv) {
 		off_t size;
 
 		xmlDoc* getdoc_mem(void) {
-			return htmlReadMemory(mem,size,"stdin://","UTF-8",
+			printf("ummmm %d\n",size);
+			return htmlReadMemory(mem,size,NULL,"UTF-8",
 														HTML_PARSE_RECOVER |
 														HTML_PARSE_NOERROR |
 														HTML_PARSE_NOBLANKS |
@@ -313,7 +314,10 @@ void main(int argc, char** argv) {
 					mem = realloc(mem,size);
 				}
 				ssize_t amt = read(STDIN_FILENO,mem+off,size-off);
+				printf("read %d\n",amt);
 				if(amt == 0) {
+					size = off;
+					mem = realloc(mem,size);
 					return;
 				}
 				if(amt < 0) {
