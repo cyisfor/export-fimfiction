@@ -9,6 +9,7 @@
 
 #include <libxml/parser.h>
 #include <sys/mman.h> // mmap
+#include <sys/stat.h>
 
 #include <pcre.h>
 #include <error.h>
@@ -18,6 +19,7 @@
 #include <error.h>
 #include <ctype.h> // isspace
 #include <unistd.h> // isatty
+#include <stdlib.h> // malloc
 
 // meh
 #define WARN(a...) error(0,0,"warning: " a)
@@ -256,11 +258,6 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 
 #define PARSE(a) parse(a,-1,0)
 
-xmlDoc* getdoc_stdin(void) {
-
-	lseek(STDIN_FILENO,0,SEEK_SET);
-		
-
 void main(int argc, char** argv) {
 	// fimfiction is dangerous, so default to censored
 	if(NULL==getenv("uncensored")) {
@@ -323,18 +320,12 @@ void main(int argc, char** argv) {
 			}
 		}
 		setit();
-	} else {
-		getdoc = getdoc_stdin;
 	}
 			
 
 
   void recalculate() {
-		xmlDoc* doc = htmlReadFile(source, "UTF-8",
-															 HTML_PARSE_RECOVER |
-															 HTML_PARSE_NOERROR |
-															 HTML_PARSE_NOBLANKS |
-															 HTML_PARSE_COMPACT);
+		xmlDoc* doc = getdoc();
 
 		xmlNode* storyE = (xmlNode*)doc;
 		html_when(storyE);
