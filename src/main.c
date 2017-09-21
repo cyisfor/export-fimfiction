@@ -306,6 +306,7 @@ void main(int argc, char** argv) {
 				exit(23);
 			}
 			mem = malloc(0x1000);
+			size = 0x1000;
 			off_t off = 0;
 			for(;;) {
 				if(size-off < 0x100) {
@@ -313,7 +314,6 @@ void main(int argc, char** argv) {
 					mem = realloc(mem,size);
 				}
 				ssize_t amt = read(STDIN_FILENO,mem+off,size-off);
-				printf("ummm\n");
 				if(amt == 0) {
 					size = off;
 					mem = realloc(mem,size);
