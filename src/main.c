@@ -284,7 +284,7 @@ void main(int argc, char** argv) {
 		off_t size;
 
 		xmlDoc* getdoc_mem(void) {
-			return htmlReadMemory(mem,size,NULL,"UTF-8",
+			return htmlReadMemory(mem,size,"http://nothing.nowhere","UTF-8",
 														HTML_PARSE_RECOVER |
 														HTML_PARSE_NOERROR |
 														HTML_PARSE_NOBLANKS |
