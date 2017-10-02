@@ -264,6 +264,19 @@ void main(int argc, char** argv) {
 		setenv("censored","1",1);
 	}
 
+	LIBXML_TEST_VERSION;
+
+	void on_error(void * userData, xmlErrorPtr error) {
+		if(html_when_handled_error(error)) return;
+		if(error->code == XML_HTML_UNKNOWN_TAG) {
+			const char* name = error->str1;
+			if(lookup_wanted(name) != UNKNOWN_TAG) return;
+		}
+		fprintf(stderr,"xml error %s %s\n",error->message,
+						error->level == XML_ERR_FATAL ? "fatal..." : "ok");
+	}
+	xmlSetStructuredErrorFunc(NULL,on_error);
+
 	const char* path = NULL;
 
 	wordcount_setup();
