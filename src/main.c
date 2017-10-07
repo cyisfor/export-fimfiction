@@ -354,8 +354,10 @@ void main(int argc, char** argv) {
 			xmlUnlinkNode(titleE);
 			INFO("Found title %s",titleE->children->content);
 			title.l = strlen(titleE->children->content);
-			title.s = realloc(title.s, title.l);
+			// stupid GTK requires null termination
+			title.s = realloc(title.s, title.l+1);
 			memcpy(title.s, titleE->children->content, title.l);
+			title.s[title.l] = '\0';
 			xmlFreeNode(titleE);
 		}
 		free(author.s);
@@ -390,6 +392,7 @@ void main(int argc, char** argv) {
 		output = open_memstream(&story.s,&story.l);
 		remove_blank = true;
 		PARSE(storyE);
+		fputc('\0',output);
 		fclose(output);
 		output = NULL;
 		int i = 0;
