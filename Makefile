@@ -1,9 +1,10 @@
 include coolmake/main.mk
 coolmake/main.mk: | coolmake
 	@echo Coolmake...
-	@[[ -n "$(CLEANING)" ]] && exit 0
-	@[[ -e $@ ]] || exit 3
-	@$(MAKE) $(MAKECMDGOALS)
+	@if [[ -z "$(CLEANING)" ]]; then \
+		[[ -e $@ ]] || exit 3; \
+		$(MAKE) $(MAKECMDGOALS); \
+	fi
 .PRECIOUS: coolmake/main.mk
 
 coolmake: html_when/coolmake
