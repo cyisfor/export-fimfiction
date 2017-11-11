@@ -1,7 +1,5 @@
-DERP:=$(shell $(MAKE) -C html_when)
-
 CFLAGS+=-ggdb -O2
-CFLAGS+=-Io -Ihtml_when/src -Ilibxml2/include -Ilibxmlfixes/ -Ilibxmlfixes/o
+CFLAGS+=-Io -Ihtml_when/src -Ilibxml2/include -Ilibxmlfixes/src -Ilibxmlfixes/o
 P=gtk+-3.0 glib-2.0 gio-2.0
 
 LDLIBS+=$(shell pkg-config --libs $P) -lpcre
