@@ -15,22 +15,18 @@ N=gui wordcount main
 OUT=export-fimfiction
 $(eval $(PROGRAM))
 
-$(O)/main.lo: libxml2/include/libxml/xmlversion.h libxmlfixes/o/wanted_tags.gen.h
-
-
+$(OBJ) $(DEP): libxml2/include/libxml/xmlversion.h libxmlfixes/o/wanted_tags.gen.h
 
 libxml2/include/libxml/xmlversion.h libxml2/.libs/libxml2.a: libxml2/configure
 
-libxml2/libxml2.la libxml2/configure: | libxml2
-	$(MAKE) -C html_when
+$(call AUTOMAKE_SUBPROJECT,libxml2,libxml2)
+
+libxml2/configure.ac: | libxml2
 
 html_when/libhtmlwhen.la html_when/libxml2: | html_when
-	$(MAKE) -C html_when
+	$(MAKE) -C html_when $(notdir $@)
 
 libxml2: | html_when/libxml2
-	ln -rs $| $@
-
-html_when:
-	sh setup.sh
+	$(SYMLINK)
 
 all: export-fimfiction
