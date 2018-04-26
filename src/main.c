@@ -95,7 +95,7 @@ void output_f(const char* s, int l) {
 		needs = NONE;
 		break;
 	};
-
+	if(!l) return;
 	int res = fwrite(s,l,1,output);
 	assert(res == 1);
 }
@@ -105,6 +105,27 @@ void output_f(const char* s, int l) {
 #define OUTS output_f
 
 bool remove_blank = true;
+
+bool doublespace = false;
+
+void parse_text(const char* text, int len) {
+	if(!doublespace) {
+		OUTS(text, len);
+		return;
+	}
+	int i;
+	for(i=0;i<len;++i) {
+		switch(text[i]) {
+		case '\n':
+			fwrite("\n\n",2,1,output);
+			break;
+		case '\\':
+			fwrite(text+i,2,1,output);
+			++i;
+		}
+	}
+	OUTS(NULL, 0);
+}
 
 void parse(xmlNode* cur, int listitem, int listlevel) {
 	if(!cur) return;
@@ -244,11 +265,11 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 						break;
 				}
 				if(noblank != len) {
-					OUTS(cur->content+noblank,len-noblank);
+					parse_text(cur->content+noblank,len-noblank);
 				}
 				remove_blank = false;
 			} else {
-				OUTS(cur->content,strlen(cur->content));
+				parse_text(cur->content,strlen(cur->content));
 			}
 		}
 		break;
