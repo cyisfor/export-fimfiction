@@ -122,6 +122,8 @@ void parse_text(const char* text, int len) {
 		case '\\':
 			fwrite(text+i,2,1,output);
 			++i;
+		default:
+			fputc(text[i], output);
 		}
 	}
 	OUTS(NULL, 0);
@@ -193,7 +195,10 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 
 		case W_A: argTag("url",findProp(cur,"href"));
 			break;
-		case W_CHAT:  dumbTag("quote");
+		case W_CHAT:
+			doublespace = true;
+			dumbTag("quote");
+			doublespace = false;
 			break;
 		case W_I: dumbTag("i");
 			break;
