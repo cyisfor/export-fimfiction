@@ -78,7 +78,7 @@ const string getContents(int i) {
 		return *((const string*)&author);
     break;
   default:
-    error(23,0,"Bad index %s",i);
+    error(23,0,"Bad index %d",i);
   }
 }
 
@@ -220,10 +220,9 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 			break;
 		case W_DIV:
 		case W_SPAN:
-		{
-			if(0==ISLIT(findProp(cur,"class"),"spoiler"))
-				return dumbTag("spoiler");
-		}
+			if(ISLIT(findProp(cur,"class"),"spoiler")) {
+				dumbTag("spoiler");
+			}
 			break;
 		case W_ROOT:
 		case W_P:
