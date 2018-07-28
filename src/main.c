@@ -82,6 +82,22 @@ const string getContents(int i) {
   }
 }
 
+static void trim(mstring* s) {
+	int start = 0;
+	while(start < s->l && isspace(s->s[start])) ++start;
+	int end = s->l - 1;
+	while(end > start && isspace(s->s[end])) --end;
+	if(start == end) {
+		s.l = 0;
+	} else {
+		if(start > 0) {
+			memmove(s.s, s.s + start, end - start);
+			s.l = end - start + 1;
+		} else {
+			s.l = end + 1
+	}
+}
+
 enum { NONE, NEEDASPACE, NEEDNL } needs = NONE;
 
 void output_f(const char* s, int l) {
@@ -382,6 +398,7 @@ void main(int argc, char** argv) {
 			// stupid GTK requires null termination
 			title.s = realloc(title.s, title.l+1);
 			memcpy(title.s, titleE->children->content, title.l);
+			trim(&title);
 			title.s[title.l] = '\0';
 			xmlFreeNode(titleE);
 		}
@@ -414,11 +431,14 @@ void main(int argc, char** argv) {
 		}
 		find_notes(storyE);
 		fclose(output);
+		trim(&author);
+		
 		output = open_memstream(&story.s,&story.l);
 		remove_blank = true;
 		PARSE(storyE);
 		fputc('\0',output);
 		fclose(output);
+		trim(&story);
 		output = NULL;
 		int i = 0;
 		size_t wid = 20;
