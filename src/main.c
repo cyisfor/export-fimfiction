@@ -107,7 +107,7 @@ static void trim(mstring* s) {
 		s->s[0] = '\0';
 		s->l = 0;
 	} else if(start > 0) {
-		memmove(s->s, s->s + start, end - start);
+		memmove(s->s, s->s + start, end - start + 1);
 		s->l = end - start + 2;
 		s->s[end - start + 1] = '\0';
 	} else if(s->l - 1 == end) {
