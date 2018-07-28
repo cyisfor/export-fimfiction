@@ -90,17 +90,30 @@ static bool whitestuff(char c) {
 	
 
 static void trim(mstring* s) {
+	if(s->l == 0) return;
+	if(s->l == 1) {
+		if(whitestuff(s->s[0])) {
+			s->s[0] = '\0';
+			s->l = 0;
+		}
+		return;
+	}
+	
 	int start = 0;
 	while(start < s->l && whitestuff(s->s[start])) ++start;
 	int end = s->l - 1;
 	while(end > start && whitestuff(s->s[end])) --end;
 	if(start == end) {
+		s->s[0] = '\0';
 		s->l = 0;
 	} else if(start > 0) {
 		memmove(s->s, s->s + start, end - start);
-		s->l = end - start + 1;
+		s->l = end - start + 2;
+		s->s[end - start + 1] = '\0';
+	} else if(s->l - 1 == end) {
 	} else {
 		s->l = end + 1;
+		s->s[end] = '\0';
 	}
 }
 
