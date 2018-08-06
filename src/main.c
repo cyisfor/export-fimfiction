@@ -85,6 +85,7 @@ const string getContents(int i) {
 static bool whitestuff(char c) {
 	if(isspace(c)) return true;
 	if(!isgraph(c)) return true;
+	if(!c) return true;
 	return false;
 }
 	
@@ -101,7 +102,7 @@ static void trim(mstring* s) {
 	
 	int start = 0;
 	while(start < s->l && whitestuff(s->s[start])) ++start;
-	int end = s->l - 1;
+	int end = s->l;
 	while(end > start && whitestuff(s->s[end])) --end;
 	if(start == end) {
 		s->s[0] = '\0';
@@ -110,10 +111,10 @@ static void trim(mstring* s) {
 		memmove(s->s, s->s + start, end - start + 1);
 		s->l = end - start + 2;
 		s->s[end - start + 1] = '\0';
-	} else if(s->l - 1 == end) {
+	} else if(s->l == end + 1) {
 	} else {
 		s->l = end + 1;
-		s->s[end] = '\0';
+		s->s[end+1] = '\0';
 	}
 }
 
