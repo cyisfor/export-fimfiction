@@ -185,6 +185,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 	}
 #define dumbTag(a) dumbTagderp(a,sizeof(a)-1)
 	void argTagderp(const char* realname, size_t rlen, const char* arg) {
+		if(!arg) return;
 		size_t alen = strlen(arg);
 		OUTLIT("[");
 		OUTS(realname,rlen);
