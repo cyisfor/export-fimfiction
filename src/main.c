@@ -102,7 +102,7 @@ static void trim(mstring* s) {
 	
 	int start = 0;
 	while(start < s->l && whitestuff(s->s[start])) ++start;
-	int end = s->l;
+	int end = s->l - 1;
 	while(end > start && whitestuff(s->s[end])) --end;
 	if(start == end) {
 		s->s[0] = '\0';
