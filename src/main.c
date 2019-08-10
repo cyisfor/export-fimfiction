@@ -56,7 +56,7 @@ static xmlNode* get_title(xmlNode* top) {
 
 	return get_title(top->next);
 }
-		
+
 /* T deEntitize(T)(T inp) { */
 /* 	T replace(Captures!T m) { */
 /* 		auto res = getEntityUTF8(m[1]); */
@@ -84,8 +84,8 @@ const string getContents(int i) {
   }
 }
 
-static bool whitestuff(mstring* cur) {
-	gunichar c = g_utf8_get_char(cur.s, cur.l);
+static bool whitestuff(const mstring cur) {
+	gunichar c = g_utf8_get_char(cur.s);
 	if(g_unichar_isspace(c)) return true;
 	if(!g_unichar_isgraph(c)) return true;
 	if(!c) return true;
@@ -96,7 +96,7 @@ static bool whitestuff(mstring* cur) {
 static void next_char(mstring* cur) {
 	char* next = g_utf8_next_char(cur->s);
 	assert(next);
-	cur->l += (next - cur.s);
+	cur->l += (next - cur->s);
 	cur->s = next;
 }
 
@@ -110,10 +110,7 @@ static bool prev_char(const mstring cur, mstring* tail) {
 	}
 	return false;
 }
-			
-				
-	
-qls
+
 static void trim(mstring* base) {
 	if(base->l == 0) return;
 	mstring cur = {base->s, base->l};
@@ -134,7 +131,7 @@ static void trim(mstring* base) {
 	}
 	mstring tail = {cur.s+cur.l-1, 0};
 	for(;;) {
-		if(false == prev_char(&tail)) {
+		if(false == prev_char(cur, &tail)) {
 			base->s[0] = '\0';
 			base->l = 0;
 			return;
@@ -155,7 +152,7 @@ static void trim(mstring* base) {
 		} else {
 			memmove(base->s, nowhite.s, nowhite.l);
 		}
-		base->l = nowhite.l
+		base->l = nowhite.l;
 		base->s[base->l] = '\0';
 	} else if(base->l == nowhite.l + 1) {
 	} else {
@@ -183,7 +180,7 @@ void output_f(const char* s, int l) {
 }
 #define OUTLIT(a) output_f(a,sizeof(a)-1)
 #define OUTSTR(a) output_f(a.s,a.l);
-#define OUTF(a...) fprintf(output,a)						
+#define OUTF(a...) fprintf(output,a)
 #define OUTS output_f
 
 bool remove_blank = true;
@@ -213,7 +210,7 @@ void parse_text(const char* text, int len) {
 
 void parse(xmlNode* cur, int listitem, int listlevel) {
 	if(!cur) return;
-	
+
 	void pkids() {
 		return parse(cur->children, listitem, listlevel);
 	}
@@ -247,7 +244,7 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 		}
 	}
 #define argTag(a,arg) argTagderp(a,sizeof(a)-1,arg)
-	
+
 	switch(cur->type) {
 	case XML_ELEMENT_NODE:
 		switch(lookup_wanted(cur->name)) {
@@ -394,10 +391,10 @@ void main(int argc, char** argv) {
 		path = argv[1];
 		xmlDoc* getdoc_arg(void) {
 			return htmlReadFile(path, "UTF-8",
-													HTML_PARSE_RECOVER |
-													HTML_PARSE_NOERROR |
-													HTML_PARSE_NOBLANKS |
-													HTML_PARSE_COMPACT);
+													XML_PARSE_RECOVER |
+													XML_PARSE_NOERROR |
+													XML_PARSE_NOBLANKS |
+													XML_PARSE_COMPACT);
 		}
 		getdoc = getdoc_arg;
 	} else {
@@ -406,10 +403,10 @@ void main(int argc, char** argv) {
 
 		xmlDoc* getdoc_mem(void) {
 			return htmlReadMemory(mem,size,"http://nothing.nowhere","UTF-8",
-														HTML_PARSE_RECOVER |
-														HTML_PARSE_NOERROR |
-														HTML_PARSE_NOBLANKS |
-														HTML_PARSE_COMPACT);
+														XML_PARSE_RECOVER |
+														XML_PARSE_NOERROR |
+														XML_PARSE_NOBLANKS |
+														XML_PARSE_COMPACT);
 		}
 		getdoc = getdoc_mem;
 		void setit(void) {
@@ -449,7 +446,7 @@ void main(int argc, char** argv) {
 		}
 		setit();
 	}
-			
+
 
 
   void recalculate() {
@@ -497,7 +494,7 @@ void main(int argc, char** argv) {
 		find_notes(storyE);
 		fclose(output);
 		trim(&author);
-		
+
 		output = open_memstream(&story.s,&story.l);
 		remove_blank = true;
 		PARSE(storyE);

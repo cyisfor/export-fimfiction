@@ -14,4 +14,4 @@ add_executable(export-fimfiction
   src/gui.c
   src/wordcount.c)
 
-target_link_libraries(export-fimfiction PRIVATE xmlfixes PkgConfig::GUI)
+target_link_libraries(export-fimfiction PRIVATE xmlfixes PkgConfig::GUI pcre)
