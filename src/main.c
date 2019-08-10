@@ -384,7 +384,7 @@ struct getdoc_closure {
 
 xmlDoc* getdoc(struct getdoc_closure* c) {
 	if(!c->doc)  {
-		c->doc = htmlReadFile(path, "UTF-8",
+		c->doc = htmlReadFile(c->path, "UTF-8",
 							  HTML_PARSE_RECOVER |
 							  HTML_PARSE_NOERROR |
 							  HTML_PARSE_NOBLANKS |
@@ -543,7 +543,9 @@ void main(int argc, char** argv) {
 		}
 		setit();
 
-		getdoc.doc = htmlReadMemory(mem,size,"http://nothing.nowhere",
+		getdoc.doc = htmlReadMemory(getdoc.mem,
+									getdoc.size,
+									"http://nothing.nowhere",
 									"UTF-8",
 									HTML_PARSE_RECOVER |
 									HTML_PARSE_NOERROR |
@@ -552,7 +554,7 @@ void main(int argc, char** argv) {
 		assert(getdoc.doc);
 		/* it can never reload though :/ */
 	}
-	guiLoop(path,recalculate, &getdoc);
+	guiLoop(path, &getdoc);
 	if(getdoc.doc) {
 		xmlFreeDoc(getdoc.doc);
 		if(getdoc.mmap) {

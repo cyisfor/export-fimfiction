@@ -83,8 +83,7 @@ void refreshRow(int i, int id, const char* name, const char* summary, int count)
 }
 
 static void doRefresh(GtkButton* btn, void* udata) {
-  void (*reload)(void) = (void (*)(void))udata;
-	reload();
+	gui_recalculate(udata);
 }
 
 static void
@@ -94,8 +93,7 @@ refreshPathChanged (GFileMonitor     *monitor,
                     GFileMonitorEvent event_type,
                     gpointer          udata) {
   if(event_type == G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT) {
-		void (*reload)(void) = (void (*)(void))udata;
-		reload();
+	  gui_recalculate(udata);
   }
 }
 
@@ -105,11 +103,10 @@ static void setCensored(GtkToggleButton *censored, gpointer udata) {
 	} else {
 		unsetenv("censored");
 	}
-	void (*reload)(void) = (void (*)(void))udata;
-	reload();
+	gui_recalculate(udata);
 }
 
-void guiLoop(const char* path, void (*reload)(void)) {
+void guiLoop(const char* path, void* ctx) {
   gtk_init(NULL,NULL);
   GtkWidget* win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	if(NULL != getenv("title")) {
@@ -122,12 +119,12 @@ void guiLoop(const char* path, void (*reload)(void)) {
   gtk_grid_insert_row(tbl,0);
   GtkWidget* refreshbtn = gtk_button_new_with_label("Reload");
   gtk_grid_attach(tbl,refreshbtn,0,0,2,1);
-  g_signal_connect(refreshbtn,"clicked",G_CALLBACK(doRefresh),reload);
+  g_signal_connect(refreshbtn,"clicked",G_CALLBACK(doRefresh),ctx);
 	GtkWidget* censored = gtk_check_button_new();
   gtk_grid_attach(tbl,censored,2,0,1,1);
 	gtk_widget_set_tooltip_markup(censored, "censored?");
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(censored), NULL != getenv("censored"));
-  g_signal_connect(censored,"toggled",G_CALLBACK(setCensored),reload);
+  g_signal_connect(censored,"toggled",G_CALLBACK(setCensored),ctx);
 
 	if(path) {
 		printf("Monitoring Path %s\n",path);
@@ -137,12 +134,12 @@ void guiLoop(const char* path, void (*reload)(void)) {
 			(f,
 			 G_FILE_MONITOR_NONE,NULL,&err);
 		assert(err==NULL);
-		g_signal_connect(mon,"changed",G_CALLBACK(refreshPathChanged),reload);
+		g_signal_connect(mon,"changed",G_CALLBACK(refreshPathChanged),ctx);
 	} else {
 		puts("WARNING: no path to monitor!");
 	}
   gtk_widget_show_all(win);
-	reload();
+  gui_recalculate(ctx);
   gtk_main();
   exit(0);
 }
