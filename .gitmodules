@@ -1,3 +1,6 @@
 [submodule "git-tools"]
 	path = git-tools
 	url = http://github.com/cyisfor/git-tools
+[submodule "libxmlfixes"]
+	path = libxmlfixes
+	url = git://github.com/cyisfor/libxmlfixes.git

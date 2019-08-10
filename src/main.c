@@ -3,7 +3,6 @@
 #include "wordcount.h"
 #include "gui.h"
 #include "mystring.h"
-#include "html_when.h"
 
 #include "wanted_tags.gen.h"
 
@@ -82,39 +81,83 @@ const string getContents(int i) {
   }
 }
 
-static bool whitestuff(char c) {
-	if(isspace(c)) return true;
-	if(!isgraph(c)) return true;
+static bool whitestuff(mstring* cur) {
+	gunichar c = g_utf8_get_char(cur.s, cur.l);
+	if(g_unichar_isspace(c)) return true;
+	if(!g_unichar_isgraph(c)) return true;
 	if(!c) return true;
+	if(c==-1) return true;
 	return false;
 }
-	
 
-static void trim(mstring* s) {
-	if(s->l == 0) return;
-	if(s->l == 1) {
-		if(whitestuff(s->s[0])) {
-			s->s[0] = '\0';
-			s->l = 0;
+static void next_char(mstring* cur) {
+	char* next = g_utf8_next_char(cur->s);
+	assert(next);
+	cur->l += (next - cur.s);
+	cur->s = next;
+}
+
+static bool prev_char(const mstring cur, mstring* tail) {
+	while(tail->l > cur.l) {
+		--tail->s;
+		++tail->l;
+		if(*tail->s < 0x80 || (*tail->s > 0xc1 && *tail->s < 0xfe)) {
+			return true;
+		}
+	}
+	return false;
+}
+			
+				
+	
+q
+static void trim(mstring* base) {
+	if(base->l == 0) return;
+	mstring cur = {base->s, base->l};
+	if(cur.l == 1) {
+		/* XXX: whole string is validated earlier */
+		if(whitestuff(cur)) {
+			base->s[0] = '\0';
+			base->l = 0;
 		}
 		return;
 	}
-	
-	int start = 0;
-	while(start < s->l && whitestuff(s->s[start])) ++start;
-	int end = s->l - 1;
-	while(end > start && whitestuff(s->s[end])) --end;
-	if(start == end) {
-		s->s[0] = '\0';
-		s->l = 0;
-	} else if(start > 0) {
-		memmove(s->s, s->s + start, end - start + 1);
-		s->l = end - start + 2;
-		s->s[end - start + 1] = '\0';
-	} else if(s->l == end + 1) {
+
+	while(cur.l > 0 && whitestuff(cur)) {
+		next_char(&cur);
+	}
+	while(cur.l > 0 && whitestuff(cur)) {
+		next_char(&cur);
+	}
+	mstring tail = {cur.s+cur.l-1, 0};
+	for(;;) {
+		if(false == prev_char(&tail)) {
+			base->s[0] = '\0';
+			base->l = 0;
+			return;
+		}
+		if(!whitestuff(tail)) break;
+	}
+
+	const mstring nowhite = {
+		.s = cur.s,
+		.l = cur.l - tail.l
+	};
+	if(nowhite.l == 0) {
+		base->s[0] = '\0';
+		base->l = 0;
+	} else if(nowhite.s > base->s) {
+		if(nowhite.s - base->s > nowhite.l) {
+			memcpy(base->s, nowhite.s, nowhite.l);
+		} else {
+			memmove(base->s, nowhite.s, nowhite.l);
+		}
+		base->l = nowhite.l
+		base->s[base->l] = '\0';
+	} else if(base->l == nowhite.l + 1) {
 	} else {
-		s->l = end + 1;
-		s->s[end+1] = '\0';
+		base->l = nowhite.l;
+		base->s[nowhite.l+1] = '\0';
 	}
 }
 
@@ -329,7 +372,6 @@ void main(int argc, char** argv) {
 	LIBXML_TEST_VERSION;
 
 	void on_error(void * userData, xmlErrorPtr error) {
-		if(html_when_handled_error(error)) return;
 		if(error->code == XML_HTML_UNKNOWN_TAG) {
 			const char* name = error->str1;
 			if(lookup_wanted(name) != UNKNOWN_TAG) return;
@@ -344,6 +386,7 @@ void main(int argc, char** argv) {
 	wordcount_setup();
 
 	xmlDoc* (*getdoc)(void);
+	/* XXX: make sure these readers validate that this is UTF-8! */
 	if(argc > 1) {
 		path = argv[1];
 		xmlDoc* getdoc_arg(void) {
@@ -408,9 +451,7 @@ void main(int argc, char** argv) {
 
   void recalculate() {
 		xmlDoc* doc = getdoc();
-
 		xmlNode* storyE = (xmlNode*)doc;
-		html_when(storyE);
 		xmlNode* titleE = get_title(storyE);
 		if(titleE) {
 			xmlUnlinkNode(titleE);
