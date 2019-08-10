@@ -373,6 +373,116 @@ void on_error(void * userData, xmlErrorPtr error) {
 			error->level == XML_ERR_FATAL ? "fatal..." : "ok");
 }
 
+/* C sucks */
+struct getdoc_closure {
+	const char* path;
+	xmlDoc* doc;
+	char* mem;
+	size_t size;
+	bool mmap;
+};
+
+xmlDoc* getdoc(struct getdoc_closure* c) {
+	if(!c->doc)  {
+		c->doc = htmlReadFile(path, "UTF-8",
+							  HTML_PARSE_RECOVER |
+							  HTML_PARSE_NOERROR |
+							  HTML_PARSE_NOBLANKS |
+							  HTML_PARSE_COMPACT);
+	}
+}
+
+void gui_recalculate(void* ctx) {
+	xmlDoc* doc = getdoc((struct getdoc_closure*)ctx);
+	xmlNode* storyE = (xmlNode*)doc;
+	xmlNode* titleE = get_title(storyE);
+	if(titleE) {
+		xmlUnlinkNode(titleE);
+		INFO("Found title %s",titleE->children->content);
+		title.l = strlen(titleE->children->content);
+		// stupid GTK requires null termination
+		title.s = realloc(title.s, title.l+1);
+		memcpy(title.s, titleE->children->content, title.l);
+		trim(&title);
+		title.s[title.l] = '\0';
+		xmlFreeNode(titleE);
+	}
+	free(author.s);
+	author.s = NULL;
+	author.l = 0;
+	if(output) fclose(output);
+	output = open_memstream(&author.s,&author.l);
+	void find_notes(xmlNode* cur) {
+		if(!cur) return;
+		switch(cur->type) {
+		case XML_ELEMENT_NODE:
+			if(lookup_wanted(cur->name) == W_DIV) {
+				xmlChar* val = findProp(cur,"class");
+				INFO("vclass %s",val);
+				if(val && ISLIT(val,"author")) {
+					PARSE(cur->children);
+					xmlNode* next = cur->next;
+					xmlUnlinkNode(cur);
+					xmlFreeNode(cur);
+					return find_notes(next);
+				}
+			}
+		case XML_DOCUMENT_NODE:
+		case XML_HTML_DOCUMENT_NODE: // libxml!!!
+			find_notes(cur->children);
+		default:
+			return find_notes(cur->next);
+		};
+	}
+	find_notes(storyE);
+	fclose(output);
+	trim(&author);
+
+	output = open_memstream(&story.s,&story.l);
+	remove_blank = true;
+	PARSE(storyE);
+	fputc('\0',output);
+	fclose(output);
+	trim(&story);
+	output = NULL;
+	int i = 0;
+	size_t wid = 20;
+    if(title.s != NULL && title.l > 0) {
+		wid = max(title.l,wid); // the width of the title but not less than 20
+		// GTK sucks, by the way, so let's waste more cycles copying data again.
+		size_t swid = min(wid,title.l);
+		char* summ = alloca(swid+1);
+		memcpy(summ,title.s,swid);
+		summ[swid] = 0;
+		refreshRow(++i,
+				   0,
+				   "title",
+				   summ,
+				   word_count(title.s,title.l));
+    }
+    if(story.l > 0) {
+		size_t swid = min(wid,story.l);
+		char* summ = alloca(swid+1);
+		memcpy(summ,story.s,swid);
+		summ[swid] = 0;
+		refreshRow(++i,
+				   1,
+				   "body",
+				   summ,
+				   word_count(story.s,story.l));
+    }
+    if(author.s != NULL && author.l > 0) {
+		size_t swid = min(wid,author.l);
+		char* summ = alloca(swid+1);
+		memcpy(summ,author.s,swid);
+		summ[swid] = 0;
+		refreshRow(++i,
+				   2,
+				   "author",
+				   summ,
+				   word_count(author.s,author.l));
+    }
+}
 
 void main(int argc, char** argv) {
 	// fimfiction is dangerous, so default to censored
@@ -388,38 +498,21 @@ void main(int argc, char** argv) {
 
 	wordcount_setup();
 
-	xmlDoc* (*getdoc)(void);
+	struct getdoc_closure getdoc = {};
 	/* XXX: make sure these readers validate that this is UTF-8! */
 	if(argc > 1) {
-		path = argv[1];
-		xmlDoc* getdoc_arg(void) {
-			xmlDoc* ret = htmlReadFile(path, "UTF-8",
-									   XML_PARSE_RECOVER |
-									   XML_PARSE_NOERROR |
-									   XML_PARSE_NOBLANKS |
-									   XML_PARSE_COMPACT);
-			printf("uhhhh %p\n",ret);
-			return ret;
-		}
-		getdoc = getdoc_arg;
+		getdoc.path = argv[1];
 	} else {
-		char* mem;
-		off_t size;
-
-		xmlDoc* getdoc_mem(void) {
-			return htmlReadMemory(mem,size,"http://nothing.nowhere","UTF-8",
-														XML_PARSE_RECOVER |
-														XML_PARSE_NOERROR |
-														XML_PARSE_NOBLANKS |
-														XML_PARSE_COMPACT);
-		}
-		getdoc = getdoc_mem;
 		void setit(void) {
 			struct stat info;
 			if(0==fstat(STDIN_FILENO,&info)) {
-				mem = mmap(NULL,info.st_size,PROT_READ,MAP_PRIVATE,STDIN_FILENO,0);
-				if(mem != MAP_FAILED) {
-					size = info.st_size;
+				getdoc.mem = mmap(NULL,
+								  info.st_size,PROT_READ,
+								  MAP_PRIVATE,STDIN_FILENO,
+								  0);
+				if(getdoc.mem != MAP_FAILED) {
+					getdoc.size = info.st_size;
+					getdoc.mmap = true;
 					return;
 				}
 				// it's a pipe, I guess?
@@ -428,123 +521,44 @@ void main(int argc, char** argv) {
 				WARN("You probably should supply an argument if you aren't redirecting a file or piping a command to stdin.");
 				exit(23);
 			}
-			mem = malloc(0x1000);
-			size = 0x1000;
-			off_t off = 0;
+			getdoc.mem = malloc(0x1000);
+			size_t size = 0x1000;
 			for(;;) {
-				if(size-off < 0x100) {
+				if(size-getdoc.size < 0x100) {
 					size += 0x1000;
-					mem = realloc(mem,size);
+					getdoc.mem = realloc(getdoc.mem,size);
 				}
-				ssize_t amt = read(STDIN_FILENO,mem+off,size-off);
+				ssize_t amt = read(STDIN_FILENO,getdoc.mem+getdoc.size,
+								   size-getdoc.size);
 				if(amt == 0) {
-					size = off;
-					mem = realloc(mem,size);
+					getdoc.mem = realloc(getdoc.mem,getdoc.size);
 					return;
 				}
 				if(amt < 0) {
 					perror("read failed?");
 					abort();
 				}
-				off += amt;
+				getdoc.size += amt;
 			}
 		}
 		setit();
+
+		getdoc.doc = htmlReadMemory(mem,size,"http://nothing.nowhere",
+									"UTF-8",
+									HTML_PARSE_RECOVER |
+									HTML_PARSE_NOERROR |
+									HTML_PARSE_NOBLANKS |
+									HTML_PARSE_COMPACT);
+		assert(getdoc.doc);
+		/* it can never reload though :/ */
 	}
-
-
-
-  void recalculate() {
-		xmlDoc* doc = getdoc();
-		xmlNode* storyE = (xmlNode*)doc;
-		xmlNode* titleE = get_title(storyE);
-		if(titleE) {
-			xmlUnlinkNode(titleE);
-			INFO("Found title %s",titleE->children->content);
-			title.l = strlen(titleE->children->content);
-			// stupid GTK requires null termination
-			title.s = realloc(title.s, title.l+1);
-			memcpy(title.s, titleE->children->content, title.l);
-			trim(&title);
-			title.s[title.l] = '\0';
-			xmlFreeNode(titleE);
+	guiLoop(path,recalculate, &getdoc);
+	if(getdoc.doc) {
+		xmlFreeDoc(getdoc.doc);
+		if(getdoc.mmap) {
+			munmap(getdoc.mem, getdoc.size);
+		} else if(getdoc.mem) {
+			g_free(getdoc.mem);
 		}
-		free(author.s);
-		author.s = NULL;
-		author.l = 0;
-		if(output) fclose(output);
-		output = open_memstream(&author.s,&author.l);
-		void find_notes(xmlNode* cur) {
-			if(!cur) return;
-			switch(cur->type) {
-			case XML_ELEMENT_NODE:
-				if(lookup_wanted(cur->name) == W_DIV) {
-					xmlChar* val = findProp(cur,"class");
-					INFO("vclass %s",val);
-					if(val && ISLIT(val,"author")) {
-						PARSE(cur->children);
-						xmlNode* next = cur->next;
-						xmlUnlinkNode(cur);
-						xmlFreeNode(cur);
-						return find_notes(next);
-					}
-				}
-			case XML_DOCUMENT_NODE:
-			case XML_HTML_DOCUMENT_NODE: // libxml!!!
-				find_notes(cur->children);
-			default:
-				return find_notes(cur->next);
-			};
-		}
-		find_notes(storyE);
-		fclose(output);
-		trim(&author);
-
-		output = open_memstream(&story.s,&story.l);
-		remove_blank = true;
-		PARSE(storyE);
-		fputc('\0',output);
-		fclose(output);
-		trim(&story);
-		output = NULL;
-		int i = 0;
-		size_t wid = 20;
-    if(title.s != NULL && title.l > 0) {
-			wid = max(title.l,wid); // the width of the title but not less than 20
-			// GTK sucks, by the way, so let's waste more cycles copying data again.
-			size_t swid = min(wid,title.l);
-			char* summ = alloca(swid+1);
-			memcpy(summ,title.s,swid);
-			summ[swid] = 0;
-      refreshRow(++i,
-                 0,
-                 "title",
-								 summ,
-								 word_count(title.s,title.l));
-    }
-    if(story.l > 0) {
-			size_t swid = min(wid,story.l);
-			char* summ = alloca(swid+1);
-			memcpy(summ,story.s,swid);
-			summ[swid] = 0;
-      refreshRow(++i,
-                 1,
-                 "body",
-                 summ,
-								 word_count(story.s,story.l));
-    }
-    if(author.s != NULL && author.l > 0) {
-			size_t swid = min(wid,author.l);
-			char* summ = alloca(swid+1);
-			memcpy(summ,author.s,swid);
-			summ[swid] = 0;
-      refreshRow(++i,
-                 2,
-                 "author",
-                 summ,
-                 word_count(author.s,author.l));
-    }
-  }
-
-  guiLoop(path,recalculate);
+	}
 }
