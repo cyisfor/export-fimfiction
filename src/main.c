@@ -8,8 +8,9 @@
 
 #include <glib.h>
 
-
 #include <libxml/parser.h>
+#include <libxml/HTMLparser.h>
+
 #include <sys/mman.h> // mmap
 #include <sys/stat.h>
 
@@ -363,6 +364,16 @@ void parse(xmlNode* cur, int listitem, int listlevel) {
 
 #define PARSE(a) parse(a,-1,0)
 
+void on_error(void * userData, xmlErrorPtr error) {
+	if(error->code == XML_HTML_UNKNOWN_TAG) {
+		const char* name = error->str1;
+		if(lookup_wanted(name) != UNKNOWN_TAG) return;
+	}
+	fprintf(stderr,"xml error %s %s\n",error->message,
+			error->level == XML_ERR_FATAL ? "fatal..." : "ok");
+}
+
+
 void main(int argc, char** argv) {
 	// fimfiction is dangerous, so default to censored
 	if(NULL==getenv("uncensored")) {
@@ -371,14 +382,6 @@ void main(int argc, char** argv) {
 
 	LIBXML_TEST_VERSION;
 
-	void on_error(void * userData, xmlErrorPtr error) {
-		if(error->code == XML_HTML_UNKNOWN_TAG) {
-			const char* name = error->str1;
-			if(lookup_wanted(name) != UNKNOWN_TAG) return;
-		}
-		fprintf(stderr,"xml error %s %s\n",error->message,
-						error->level == XML_ERR_FATAL ? "fatal..." : "ok");
-	}
 	xmlSetStructuredErrorFunc(NULL,on_error);
 
 	const char* path = NULL;
@@ -390,11 +393,13 @@ void main(int argc, char** argv) {
 	if(argc > 1) {
 		path = argv[1];
 		xmlDoc* getdoc_arg(void) {
-			return htmlReadFile(path, "UTF-8",
-													XML_PARSE_RECOVER |
-													XML_PARSE_NOERROR |
-													XML_PARSE_NOBLANKS |
-													XML_PARSE_COMPACT);
+			xmlDoc* ret = htmlReadFile(path, "UTF-8",
+									   XML_PARSE_RECOVER |
+									   XML_PARSE_NOERROR |
+									   XML_PARSE_NOBLANKS |
+									   XML_PARSE_COMPACT);
+			printf("uhhhh %p\n",ret);
+			return ret;
 		}
 		getdoc = getdoc_arg;
 	} else {
