@@ -6,6 +6,9 @@
 
 #include "wanted_tags.gen.h"
 
+#include <glib.h>
+
+
 #include <libxml/parser.h>
 #include <sys/mman.h> // mmap
 #include <sys/stat.h>
@@ -110,7 +113,7 @@ static bool prev_char(const mstring cur, mstring* tail) {
 			
 				
 	
-q
+qls
 static void trim(mstring* base) {
 	if(base->l == 0) return;
 	mstring cur = {base->s, base->l};
