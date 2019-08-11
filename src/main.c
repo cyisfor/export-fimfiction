@@ -102,7 +102,7 @@ static void next_char(mstring* cur) {
 }
 
 static bool prev_char(const mstring cur, mstring* tail) {
-	while(tail->l > cur.l) {
+	while(tail->l < cur.l) {
 		--tail->s;
 		++tail->l;
 		if(*tail->s < 0x80 || (*tail->s > 0xc1 && *tail->s < 0xfe)) {
@@ -130,7 +130,7 @@ static void trim(mstring* base) {
 	while(cur.l > 0 && whitestuff(cur)) {
 		next_char(&cur);
 	}
-	mstring tail = {cur.s+cur.l-1, 0};
+	mstring tail = {cur.s+cur.l, 0};
 	for(;;) {
 		if(false == prev_char(cur, &tail)) {
 			base->s[0] = '\0';

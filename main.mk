@@ -17,7 +17,7 @@ $(eval $(PROGRAM))
 
 $(OBJ) $(DEP): libxml2/include/libxml/xmlversion.h libxmlfixes/o/wanted_tags.gen.h
 
-$(call UPLINK,html_when,libxml2)
+$(call UPLINK,html_when/libxml2,libxml2)
 
 libxml2/include/libxml/xmlversion.h libxml2/.libs/libxml2.a: libxml2/configure
 $(call AUTOMAKE_SUBPROJECT,libxml2,libxml2)
